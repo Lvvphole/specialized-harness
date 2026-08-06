@@ -1,0 +1,144 @@
+apiVersion: specialized-harness/v1
+kind: Blueprint
+metadata:
+  name: standard-coding
+  description: >
+    One-shot coding task from natural-language specification to a
+    CI-passing pull request. Modeled on the primary Minions workflow.
+  version: "1.0.0"
+  labels:
+    tier: production
+    domain: coding
+
+spec:
+  policy:
+    max_ci_rounds: 2
+    max_agentic_recovery_attempts: 1
+    default_agentic_timeout: 15m
+    require_trajectory: true
+
+  nodes:
+    - id: provision
+      type: deterministic
+      handler: provision_sandbox
+      description: Create and warm an isolated execution environment
+
+    - id: hydrate
+      type: deterministic
+      handler: hydrate_context
+      description: Attach conditional rules and pre-fetch relevant context
+
+    - id: plan
+      type: agentic
+      handler: plan
+      description: Produce a concrete implementation plan
+      tools:
+        - read_file
+        - list_dir
+        - search_code
+        - get_ticket
+        - get_file_tree
+      system_prompt_ref: prompts/plan.md
+      budget:
+        max_tokens: 32000
+        timeout: 10m
+
+    - id: implement
+      type: agentic
+      handler: implement
+      description: Write the required code changes
+      tools:
+        - read_file
+        - write_file
+        - list_dir
+        - search_code
+        - run_local_command
+      system_prompt_ref: prompts/implement.md
+      budget:
+        max_tokens: 64000
+        timeout: 20m
+
+    - id: local_lint
+      type: deterministic
+      handler: run_local_linters
+      description: Execute configured local linters and apply available autofixes
+
+    - id: push
+      type: deterministic
+      handler: git_push
+      description: Create branch and push changes
+
+    - id: ci_round
+      type: deterministic
+      handler: selective_ci
+      description: Run selective CI against the organization’s test suite
+
+    - id: fix_ci
+      type: agentic
+      handler: fix_ci_failures
+      description: Address remaining CI failures after autofix
+      tools:
+        - read_file
+        - write_file
+        - run_local_command
+        - get_test_output
+        - search_code
+      system_prompt_ref: prompts/fix_ci.md
+      budget:
+        max_tokens: 48000
+        timeout: 15m
+
+    - id: finalize
+      type: deterministic
+      handler: create_pull_request
+      description: Open PR or emit human-handoff record
+
+  edges:
+    - from: provision
+      to: hydrate
+      on: success
+
+    - from: hydrate
+      to: plan
+      on: success
+
+    - from: plan
+      to: implement
+      on: success
+
+    - from: implement
+      to: local_lint
+      on: success
+
+    - from: local_lint
+      to: push
+      on: success
+
+    - from: local_lint
+      to: implement
+      on: failure
+      when: recovery_attempts < max_agentic_recovery_attempts
+
+    - from: push
+      to: ci_round
+      on: success
+
+    - from: ci_round
+      to: finalize
+      on: success
+
+    - from: ci_round
+      to: fix_ci
+      on: failure
+      when: ci_rounds < max_ci_rounds
+
+    - from: ci_round
+      to: finalize
+      on: failure
+      when: ci_rounds >= max_ci_rounds
+
+    - from: fix_ci
+      to: push
+      on: success
+
+  # Safety: the engine statically verifies that no path can exceed max_ci_rounds.
