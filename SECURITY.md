@@ -1,0 +1,60 @@
+# SECURITY.md — Isolation, Permissions & Threat Model
+
+**Status**: Production Authority  
+**Version**: 1.0.0
+
+---
+
+## 1. Threat Model Summary
+
+The primary risks this harness is designed to contain:
+
+- Agent attempts to reach production systems or exfiltrate data.
+- Agent attempts to disable or bypass quality gates.
+- Runaway cost or resource consumption.
+- Poisoning of the trajectory or audit trail.
+- Accidental or intentional modification of the harness itself during a run.
+
+---
+
+## 2. Isolation Guarantees
+
+- Every run executes inside a freshly provisioned (or pre-warmed and reset) sandbox.
+- The sandbox has no route to production networks or credentials.
+- Outbound network access is denied by default; any required package mirrors must be explicitly allow-listed and read-only.
+- The sandbox is destroyed at the end of the run. No state persists beyond the artifacts intentionally extracted (code changes, trajectory, PR).
+
+---
+
+## 3. Permission Model
+
+| Subject | Permissions |
+|---------|-------------|
+| Agent inside sandbox | Full local filesystem, process, and package installation rights |
+| Agent outside sandbox | None |
+| Deterministic nodes | Only the side effects required by their contract (git, lint, CI submission) |
+| Blueprint / policy files | Read-only to the agent; writable only by the harness control plane |
+
+---
+
+## 4. Tool Surface Restriction
+
+- Each agentic node receives a declared, minimal tool surface.
+- Tools that could affect the outside world (network, production APIs, secret stores) are never included in agentic node surfaces.
+- Tool results are size-limited before being returned to the model.
+
+---
+
+## 5. Audit & Non-Repudiation
+
+- Every trajectory is content-addressed and immutable once written.
+- The blueprint hash is recorded in the trajectory header.
+- Human-handoff records and PRs include a reference to the trajectory identifier.
+
+---
+
+## 6. Operational Controls
+
+- Sandbox images are built from a controlled base and scanned.
+- Policy Enforcer is the final runtime authority; it cannot be disabled by configuration that the agent can influence.
+- Secrets required for CI or PR creation are injected only into deterministic nodes that need them, never into the agent context.

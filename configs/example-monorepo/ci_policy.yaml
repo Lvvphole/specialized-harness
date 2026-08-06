@@ -1,0 +1,47 @@
+# Example monorepo overlay for selective CI and lint configuration.
+# Copy and adapt for each target monorepo.
+
+selective_ci:
+  strategy: path-based
+  # Only tests whose paths intersect the changed files (plus a small always-run set)
+  always_run:
+    - "smoke/"
+  max_tests_per_run: 500
+  timeout_minutes: 25
+
+local_linters:
+  - name: ruff
+    command: ["ruff", "check", "--fix", "."]
+    autofix: true
+  - name: mypy
+    command: ["mypy", "src"]
+    autofix: false
+
+pr_template: |
+  ## Summary
+  {{ summary }}
+
+  ## Test plan
+  - [ ] Selective CI passed
+  - [ ] Local linters clean
+
+  Trajectory: {{ trajectory_id }}
+
+tool_scopes:
+  plan:
+    - read_file
+    - list_dir
+    - search_code
+    - get_ticket
+  implement:
+    - read_file
+    - write_file
+    - list_dir
+    - search_code
+    - run_local_command
+  fix_ci:
+    - read_file
+    - write_file
+    - run_local_command
+    - get_test_output
+    - search_code
