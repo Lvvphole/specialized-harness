@@ -41,8 +41,6 @@ For the **fixture** task class (`fixtures/fix_add`, `always_fail_ci`, `over_loc`
 
 ## 2. Explicitly deferred (design intent, not shipped)
 
-These appear in GOAL.md / VERIFICATION.md / ECONOMICS.md / OBSERVABILITY.md as **destination**, not as completed runtime:
-
 | Item | Why deferred |
 |------|----------------|
 | Multi-model routing | Eval corpus still thin |
@@ -53,8 +51,15 @@ These appear in GOAL.md / VERIFICATION.md / ECONOMICS.md / OBSERVABILITY.md as *
 | Real monorepo task contracts | Authority still fixture-directory shaped |
 | Claude Code / other SDK providers | Optional future `AgentProvider`; not required for fixture Done |
 | TUI / editor UI | CLI is primary surface after v1 cleanup |
+| Direct LLM commits to `main` | **Forbidden** — PRs only; human merge (AGENTS.md §8) |
 
-Building these before more eval evidence or a concrete monorepo need would violate the **Minimum Sufficient Harness Principle** (ECONOMICS.md).
+---
+
+## 2b. Repository governance (this repo)
+
+LLMs and agents **must not** commit or merge to `main`. They open pull requests only. **Only a human** (owner @Lvvphole or designated reviewer) may merge to `main`. See AGENTS.md §8, CONSTRAINTS.md, SECURITY.md.
+
+Building deferred product features before more eval evidence would violate the **Minimum Sufficient Harness Principle** (ECONOMICS.md).
 
 ---
 
@@ -69,9 +74,7 @@ Building these before more eval evidence or a concrete monorepo need would viola
 
 ## 4. Next product moves (when justified)
 
-In priority order under AGENTS.md:
-
-1. Keep docs/README honest when the suite or CLI changes (this file).  
+1. Keep docs/README honest when the suite or CLI changes.  
 2. Generalize **authority resolution** beyond fixture directories only when a real task brief / monorepo path is required.  
 3. Admit new providers or loops only when they improve correctness, containment, or Cost per Verified Correct Outcome with evidence.
 
@@ -81,8 +84,6 @@ In priority order under AGENTS.md:
 
 | Doc | Role |
 |-----|------|
-| [AGENTS.md](../AGENTS.md) | Behavioral contract + harness-level DoD |
+| [AGENTS.md](../AGENTS.md) | Behavioral contract + harness-level DoD + §8 repo write authority |
 | [GOAL.md](../GOAL.md) | North-star workflow optimization |
 | [README.md](../README.md) | Install, CLI quick start, sprint history |
-| [docs/SPRINT6_REVIEW.md](SPRINT6_REVIEW.md) | Last closed implementation sprint |
-| [docs/SPRINT7_BACKLOG.md](SPRINT7_BACKLOG.md) | Candidates after this status lock |
