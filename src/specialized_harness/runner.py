@@ -11,7 +11,7 @@ from specialized_harness.engine.models import RunResult
 from specialized_harness.nodes.registry import make_fixture_handlers
 from specialized_harness.observability.ledger import EvidenceLedger
 from specialized_harness.observability.persistence import persist_run
-from specialized_harness.providers.http import provider_from_env
+from specialized_harness.providers.http import resolve_provider
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
 
 
@@ -24,6 +24,9 @@ def run_fixture_task(
     teardown: bool = True,
     persist: bool = True,
     runs_dir: str | Path | None = None,
+    provider: Any = None,
+    provider_name: str | None = None,
+    provider_url: str | None = None,
 ) -> RunResult:
     """Run a blueprint against a fixture task inside a disposable workspace."""
     bp = load_blueprint(blueprint_path)
@@ -31,13 +34,17 @@ def run_fixture_task(
     rid = run_id or str(uuid4())
     sandbox = WorkspaceSandbox(source, rid)
     handlers = make_fixture_handlers(Path(fixture_root), task)
+    selected = provider if provider is not None else resolve_provider(
+        provider=provider_name, provider_url=provider_url
+    )
     context: dict[str, Any] = {
         "task": task,
         "sandbox": sandbox,
         "fixture_source": source.resolve(),
-        "evidence": {},  # mutable bag shared across nodes (CI outcomes, etc.)
+        "evidence": {},
         "ledger": EvidenceLedger(),
-        "provider": provider_from_env(),
+        "provider": selected,
+        "provider_name": provider_name or type(selected).__name__,
     }
     try:
         engine = BlueprintEngine(bp, handlers, run_id=rid, context=context)
@@ -53,7 +60,10 @@ def run_fixture_task(
                 result,
                 ledger if isinstance(ledger, EvidenceLedger) else None,
                 runs_dir=runs_dir,
-                extra={"task": task},
+                extra={
+                    "task": task,
+                    "provider": context.get("provider_name"),
+                },
             )
         return result
     finally:

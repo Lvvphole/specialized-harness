@@ -78,15 +78,43 @@ class HttpAgentProvider:
         )
 
 
-def provider_from_env(
+def resolve_provider(
+    *,
+    provider: str | None = None,
+    provider_url: str | None = None,
     env: dict[str, str] | None = None,
 ) -> Any:
-    """Return HttpAgentProvider if HARNESS_PROVIDER_URL is set; else ScriptedProvider."""
+    """Select AgentProvider: explicit name/url, else env, else ScriptedProvider.
+
+    Names: scripted | http
+    HARNESS_PROVIDER / HARNESS_PROVIDER_URL still supported for operators.
+    """
     from specialized_harness.providers.scripted import ScriptedProvider
 
     e = env if env is not None else os.environ
-    url = (e.get("HARNESS_PROVIDER_URL") or "").strip()
-    if not url:
-        return ScriptedProvider()
+    name = (provider or e.get("HARNESS_PROVIDER") or "").strip().lower()
+    url = (
+        provider_url
+        if provider_url is not None
+        else e.get("HARNESS_PROVIDER_URL") or ""
+    ).strip()
     timeout = float(e.get("HARNESS_PROVIDER_TIMEOUT", "30"))
-    return HttpAgentProvider(url, timeout_s=timeout)
+
+    if name in ("", "scripted", "default"):
+        if url and not provider:
+            return HttpAgentProvider(url, timeout_s=timeout)
+        return ScriptedProvider()
+    if name == "http":
+        if not url:
+            raise ValueError(
+                "provider=http requires provider_url or HARNESS_PROVIDER_URL"
+            )
+        return HttpAgentProvider(url, timeout_s=timeout)
+    raise ValueError(f"unknown provider: {name!r} (supported: scripted, http)")
+
+
+def provider_from_env(
+    env: dict[str, str] | None = None,
+) -> Any:
+    """Backward-compatible: HARNESS_PROVIDER_URL → HTTP; else Scripted."""
+    return resolve_provider(env=env)
