@@ -5,7 +5,7 @@
 **Last Updated**: 2026-08-06  
 **Scope**: Authoritative coding-agent harness — deterministic governance of probabilistic generation
 
-This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, BLUEPRINTS.md, OBSERVABILITY.md, SECURITY.md) are subordinate to the invariants defined here.
+This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, OBSERVABILITY.md, BLUEPRINTS.md, SECURITY.md) are subordinate to the invariants defined here.
 
 ---
 
@@ -79,7 +79,7 @@ A strong authoritative harness optimizes approximately:
 \text{Harness Value} = \frac{\text{Correct Accepted Outcomes} \times \text{Failure Containment}}{\text{Latency} \times \text{Cost} \times \text{Added Failure Surface}}
 \]
 
-Every control must earn its place by measurably improving correctness, containment, or authority enforcement. The harness itself must not become a larger, slower, or more expensive failure surface than the coding task it governs. See ECONOMICS.md for the full total-cost-of-correctness formulation and the Minimum Sufficient Harness Principle.
+Every control must earn its place by measurably improving correctness, containment, or authority enforcement. The harness itself must not become a larger, slower, or more expensive failure surface than the coding task it governs. See ECONOMICS.md for the full total-cost-of-correctness formulation and the Minimum Sufficient Harness Principle. See OBSERVABILITY.md for measurement of whether the system is consistently delivering that value.
 
 ---
 
@@ -105,7 +105,7 @@ The model that generated the implementation does not get to declare completion. 
 - explicit human escalation when residual judgment is required.
 
 ### 2.6 Minimum Sufficient Control Surface
-Every additional control, node, tool, or policy layer must demonstrably improve correctness, containment, or authority enforcement. Complexity that does not improve the value function is rejected. See ECONOMICS.md for control admission, runtime admission, and the rational stopping rule.
+Every additional control, node, tool, or policy layer must demonstrably improve correctness, containment, or authority enforcement. Complexity that does not improve the value function is rejected. See ECONOMICS.md for control admission, runtime admission, and the rational stopping rule. See OBSERVABILITY.md for the evidence that makes those decisions empirical.
 
 ### Supporting Process Invariants
 
@@ -119,7 +119,7 @@ Every additional control, node, tool, or policy layer must demonstrably improve 
    All execution occurs inside disposable, non-networked, non-production sandboxes. The agent receives full local permissions inside the sandbox and zero permissions outside it.
 
 9. **Trajectory completeness.**  
-   Every node execution (agentic or deterministic) must emit a structured trajectory record. Incomplete trajectories are treated as infrastructure failures.
+   Every node execution (agentic or deterministic) must emit a structured trajectory record. Incomplete trajectories are treated as infrastructure failures. See OBSERVABILITY.md.
 
 10. **Sprint size limit.**  
     Net lines of code changed in a single sprint/run must not exceed 1,000. Exceeding this limit forces human handoff or rejection.
@@ -184,7 +184,7 @@ This harness is deliberately model-agnostic. Any model that can follow tool-call
 ## 7. Authority Hierarchy
 
 1. This file (AGENTS.md)
-2. CONSTRAINTS.md, VERIFICATION.md, and ECONOMICS.md (parallel; subordinate only to AGENTS.md)
+2. CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, and OBSERVABILITY.md (parallel; subordinate only to AGENTS.md)
 3. ARCHITECTURE.md
 4. BLUEPRINTS.md + individual blueprint definitions
 5. Runtime configuration and monorepo-specific overlays
