@@ -10,7 +10,13 @@ from specialized_harness.cli_summary import format_run_summary
 from specialized_harness.config import load_config
 from specialized_harness.observability.metrics import summarize_runs_dir
 from specialized_harness.observability.persistence import load_run
+from specialized_harness.providers.http import resolve_provider
 from specialized_harness.runner import run_fixture_task
+
+# Errors that mean "the operator asked for something impossible", not "the
+# harness broke". These are reported as a one-line message; anything else keeps
+# its traceback, because an unexpected exception is an infrastructure failure.
+USAGE_ERRORS = (ValueError, FileNotFoundError)
 
 
 def _resolve_run_args(args: argparse.Namespace, cfg) -> dict:
@@ -95,23 +101,32 @@ def main(argv: list[str] | None = None) -> int:
     )
     met_p.add_argument(
         "--runs-dir",
-        default="artifacts/runs",
-        help="Directory containing <run_id>/run.json",
+        default=None,
+        help="Directory containing <run_id>/run.json (default: config.runs_dir)",
     )
+    met_p.add_argument("--config", default=None, help="Path to YAML config")
     met_p.add_argument("--json", action="store_true")
 
     args = parser.parse_args(argv)
 
     if args.cmd == "run":
-        cfg = load_config(args.config)
-        resolved = _resolve_run_args(args, cfg)
+        try:
+            cfg = load_config(args.config)
+            resolved = _resolve_run_args(args, cfg)
+            # Resolved here rather than inside the runner so an unknown provider
+            # or a missing provider URL is reported before any run starts.
+            provider = resolve_provider(
+                provider=resolved["provider"],
+                provider_url=resolved["provider_url"],
+            )
+        except USAGE_ERRORS as e:
+            raise SystemExit(f"error: {e}") from e
         result = run_fixture_task(
             resolved["blueprint"],
             resolved["fixture_root"],
             resolved["task"],
             runs_dir=resolved["runs_dir"],
-            provider_name=resolved["provider"],
-            provider_url=resolved["provider_url"],
+            provider=provider,
         )
         claims: list = []
         run_json = Path(resolved["runs_dir"]) / result.run_id / "run.json"
@@ -148,7 +163,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if result.final_status.value in ("ACCEPT", "HUMAN_HANDOFF") else 1
 
     if args.cmd == "metrics":
-        summary = summarize_runs_dir(Path(args.runs_dir))
+        try:
+            # `run` writes to config.runs_dir, so `metrics` must read from the
+            # same place or it silently reports on a directory nobody wrote to.
+            runs_dir = args.runs_dir or load_config(args.config).runs_dir
+        except USAGE_ERRORS as e:
+            raise SystemExit(f"error: {e}") from e
+        summary = summarize_runs_dir(Path(runs_dir))
         data = summary.to_dict()
         if args.json:
             print(json.dumps(data, indent=2, sort_keys=True))
