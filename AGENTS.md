@@ -2,7 +2,7 @@
 
 **Status**: Production Authority  
 **Version**: 1.1.0  
-**Last Updated**: 2026-08-06  
+**Last Updated**: 2026-08-07  
 **Scope**: Authoritative coding-agent harness — deterministic governance of probabilistic generation
 
 This document is the primary behavioral authority for any agent operating inside this harness. All other documents are subordinate to the invariants defined here. The ultimate destination of the entire system is defined in [GOAL.md](GOAL.md).
@@ -16,6 +16,17 @@ An authoritative coding-agent harness exists to ensure that only repository-conf
 The coding model is **not** the authority.  
 The repository, specifications, invariants, tests, policies, and acceptance rules **are** the authority.  
 The harness exists to enforce that boundary.
+
+### Who this serves
+
+Primary users are **both**:
+
+| Persona | What they want from the harness |
+|---------|----------------------------------|
+| **Engineer / operator** | Repository-conformant, evidence-backed acceptance or handoff; inspectable trajectories; enforceable policy |
+| **Vibe coder** | Deterministic-feeling workflows, clean verified code, and a clear accept/reject outcome without trusting the model’s claim of success |
+
+These are not competing products. Both use the same transformation — probabilistic proposal → constrained execution → objective verification → authoritative acceptance or rejection. The coding model remains a replaceable resource. User experience may simplify launch and inspection; it must not weaken independent declaration of success or the five questions below.
 
 **Ultimate goal** (see GOAL.md):
 
