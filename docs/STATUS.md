@@ -9,81 +9,66 @@ It is **not** a substitute for the authority documents. Runtime behavior must st
 
 ---
 
-## 1. Done for supported tasks (fixtures)
+## 1. Done for supported tasks
 
-For the **fixture** task class (`fixtures/fix_add`, `always_fail_ci`, `over_loc`), the harness meets AGENTS.md §4:
+### Fixtures
 
-| # | Requirement | Evidence on `main` |
-|---|-------------|-------------------|
-| 1 | Establish applicable authority | `resolve_authority` (fixture path must exist) |
-| 2 | Constrain authorized scope | Disposable `WorkspaceSandbox`; path escape rejected |
-| 3 | Produce or obtain an implementation | `AgentProvider` → harness-owned `apply_proposal` |
-| 4 | Independently verify outcome + invariants | Net LOC, `py_compile`, workspace `pytest`, evidence ledger |
-| 5 | Reject unsupported completion claims | `decide` reads ledger only — never provider text |
-| 6 | Emit evidence for accept/reject | Trajectory + `artifacts/runs/<id>/run.json` |
+For `fixtures/fix_add`, `always_fail_ci`, `over_loc`, the harness meets AGENTS.md §4.
+
+### Repo mode (sample)
+
+For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven offline (ScriptedProvider + workspace pytest + ledger). Isolation of the sample tree is preserved.
 
 **Proven outcomes**
 
-- **ACCEPT** — product-code repair (`fix_add`) with mandatory `tests_pass`  
-- **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)  
+- **ACCEPT** — fixture product-code repair (`fix_add`)
+- **ACCEPT (repo mode)** — `samples/repo_add` via `--repo` + brief
+- **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
-**Suite**: `pytest` **73 passed** (CLI v1 included).
+**Suite**: `pytest` **87 passed**.
 
-**Operator UX (CLI v1)** — does not change authority:
+**Operator UX**
 
-- `.specialized-harness.yaml` defaults  
-- Short form: `specialized-harness run fix_add`  
-- Human summary by default; `--json` opt-in  
-- Provider switch: config / `--provider` / env (`scripted` \| `http`)
+```bash
+specialized-harness run fix_add
+specialized-harness run --repo samples/repo_add --task "Fix the broken add function"
+```
 
 ---
 
-## 2. Explicitly deferred (design intent, not shipped)
+## 2. Explicitly deferred
 
 | Item | Why deferred |
 |------|----------------|
 | Multi-model routing | Eval corpus still thin |
 | Pareto / offline workflow search | Eval corpus still thin |
-| Full Code Maintenance Loop | Needs post-merge repo lifecycle |
-| Credentialed remote git + PR creation | `push` is local-commit only; remote reported skipped |
-| Selective path-based CI | Example overlay only under `configs/` |
-| Real monorepo task contracts | Authority still fixture-directory shaped |
-| Claude Code / other SDK providers | Optional future `AgentProvider`; not required for fixture Done |
-| TUI / editor UI | CLI is primary surface after v1 cleanup |
-| Direct LLM commits to `main` | **Forbidden** — PRs only; human merge (AGENTS.md §8) |
+| Full Code Maintenance Loop | Post-merge lifecycle |
+| Credentialed remote git + PR creation | Local commit only |
+| Selective path-based CI | Example overlay only |
+| Full arbitrary monorepo repair | Sample proven; general trees need live provider |
+| Claude Code / other SDK providers | Optional; not required for sample Done |
+| TUI / editor UI | CLI primary |
+| Direct LLM commits to `main` | Forbidden — PRs only (AGENTS.md §8) |
 
 ---
 
-## 2b. Repository governance (this repo)
+## 2b. Repository governance
 
-LLMs and agents **must not** commit or merge to `main`. They open pull requests only. **Only a human** (owner @Lvvphole or designated reviewer) may merge to `main`. See AGENTS.md §8, CONSTRAINTS.md, SECURITY.md.
-
-Building deferred product features before more eval evidence would violate the **Minimum Sufficient Harness Principle** (ECONOMICS.md).
+LLMs/agents open PRs only. **Only a human** (@Lvvphole or designate) merges to `main`.
 
 ---
 
-## 3. What “Done” does *not* mean
+## 3. What Done does *not* mean
 
-- The model is **not** the authority.  
-- A chat UI declaring success is **not** Done.  
-- Authority documents describing a capability is **not** the same as shipped, tested behavior.  
-- Cost-optimal multi-model routing is **not** claimed without reproducible evals (GOAL.md).
+- The model is not the authority.
+- A chat UI declaring success is not Done.
+- Authority text is not shipped behavior.
 
 ---
 
 ## 4. Next product moves (when justified)
 
-1. Keep docs/README honest when the suite or CLI changes.  
-2. Generalize **authority resolution** beyond fixture directories only when a real task brief / monorepo path is required.  
-3. Admit new providers or loops only when they improve correctness, containment, or Cost per Verified Correct Outcome with evidence.
-
----
-
-## 5. Pointers
-
-| Doc | Role |
-|-----|------|
-| [AGENTS.md](../AGENTS.md) | Behavioral contract + harness-level DoD + §8 repo write authority |
-| [GOAL.md](../GOAL.md) | North-star workflow optimization |
-| [README.md](../README.md) | Install, CLI quick start, sprint history |
+1. Live `HttpAgentProvider` against a real tree with reproducible evals.
+2. Selective CI / path policies when a monorepo demands it.
+3. Admit controls only when they improve Cost per Verified Correct Outcome.

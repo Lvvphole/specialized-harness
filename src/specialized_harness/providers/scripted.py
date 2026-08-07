@@ -1,4 +1,4 @@
-"""Scripted provider - deterministic proposals for fixtures (no live model)."""
+"""Scripted provider - deterministic proposals for fixtures and samples (no live model)."""
 from __future__ import annotations
 
 from typing import Any
@@ -11,8 +11,26 @@ _FIX_ADD_APP = '''def add(a, b):
 '''
 
 
+def _wants_fix_add(context: dict[str, Any]) -> bool:
+    task = str(context.get("task") or "")
+    brief = str(context.get("task_brief") or "")
+    if task == "fix_add":
+        return True
+    blob = f"{task} {brief}".lower()
+    if "add" in blob and ("fix" in blob or "broken" in blob or "repair" in blob):
+        return True
+    source = str(
+        context.get("fixture_source")
+        or (context.get("authority") or {}).get("root")
+        or ""
+    )
+    if "repo_add" in source.replace("\\", "/"):
+        return True
+    return False
+
+
 class ScriptedProvider:
-    """Minimum-sufficient provider: task-keyed file mutations for proofs."""
+    """Minimum-sufficient provider: deterministic mutations for offline proofs."""
 
     def propose(self, node_id: str, context: dict[str, Any]) -> AgentProposal:
         task = context.get("task", "")
@@ -28,7 +46,7 @@ class ScriptedProvider:
                     content=f"implemented-by:{run_id}\n",
                 )
             ]
-            if task == "fix_add":
+            if _wants_fix_add(context):
                 mutations.append(FileMutation(path="app.py", content=_FIX_ADD_APP))
             if task == "over_loc":
                 mutations.append(
