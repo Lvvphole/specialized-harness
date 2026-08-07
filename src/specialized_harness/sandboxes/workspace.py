@@ -1,4 +1,4 @@
-"""Disposable workspace sandbox — isolation boundary for a single run.
+"""Disposable workspace sandbox - isolation boundary for a single run.
 
 AGENTS.md / SECURITY.md: execution occurs in a disposable workspace.
 Source fixtures and the harness tree must not be mutated by a run.
@@ -23,6 +23,7 @@ class WorkspaceSandbox:
         self.run_id = run_id
         self.root: Path | None = None
         self._source_fingerprint: dict[str, str] = {}
+        self.baseline_snapshot: dict[str, str] = {}
 
     def provision(self) -> Path:
         if not self.source.is_dir():
@@ -32,6 +33,9 @@ class WorkspaceSandbox:
         dest = parent / "workspace"
         shutil.copytree(self.source, dest)
         self.root = dest.resolve()
+        from specialized_harness.nodes.deterministic.loc import snapshot_text_files
+
+        self.baseline_snapshot = snapshot_text_files(self.root)
         return self.root
 
     def resolve(self, relative: str | Path) -> Path:
