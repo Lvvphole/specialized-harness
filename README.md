@@ -64,7 +64,7 @@ These documents are the source of truth. Runtime code must enforce them.
 git clone https://github.com/Lvvphole/specialized-harness.git
 cd specialized-harness
 pip install -e ".[dev]"
-pytest -q   # expect green (currently 51 tests)
+pytest -q   # expect green (currently 59 tests)
 ```
 
 ## Quick Start (fixture demos)
@@ -117,6 +117,7 @@ Expected: not `ACCEPT` when measured net LOC exceeds `max_net_loc` (1000).
 | **2** | Real sandbox, verify, LOC, ledger, provider | Closed | [SPRINT2_REVIEW.md](docs/SPRINT2_REVIEW.md) |
 | **3** | Product-code fix, honest git, persistence | Musts closed | [SPRINT3_REVIEW.md](docs/SPRINT3_REVIEW.md) · [SPRINT3_BACKLOG.md](docs/SPRINT3_BACKLOG.md) |
 | **4** | Latency metrics, registry modularization, docs | Closed | [SPRINT4_REVIEW.md](docs/SPRINT4_REVIEW.md) · [SPRINT4_BACKLOG.md](docs/SPRINT4_BACKLOG.md) |
+| **5** | Offline metrics + HTTP provider boundary | Closed | [SPRINT5_REVIEW.md](docs/SPRINT5_REVIEW.md) · [SPRINT5_BACKLOG.md](docs/SPRINT5_BACKLOG.md) |
 
 ## Repository layout (runtime)
 
@@ -124,9 +125,9 @@ Expected: not `ACCEPT` when measured net LOC exceeds `max_net_loc` (1000).
 src/specialized_harness/
   engine/           # BlueprintEngine state machine, models
   nodes/            # deterministic + agentic handlers, registry
-  providers/        # AgentProvider protocol, ScriptedProvider
+  providers/        # AgentProvider protocol, ScriptedProvider, HttpAgentProvider
   sandboxes/        # disposable workspace isolation
-  observability/    # EvidenceLedger, run persistence
+  observability/    # EvidenceLedger, run persistence, metrics
   policy/           # CI/LOC/trajectory enforcer
 blueprints/         # standard-coding.yaml
 fixtures/           # fix_add, always_fail_ci, over_loc
