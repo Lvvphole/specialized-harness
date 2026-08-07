@@ -1,26 +1,32 @@
 # Specialized Agentic Harness
 
-**Authoritative coding-agent harness — deterministic governance of probabilistic generation**
+**A model-agnostic optimization system for discovering, executing, verifying, and economically selecting workflows for complex problem solving.**
 
-This repository provides a reusable, model-agnostic specialized agentic harness. Its purpose is to ensure that only repository-conformant, independently verified changes can cross the boundary from model-generated proposal to accepted implementation, while keeping latency, cost, complexity, and new failure surface to the minimum sufficient level.
+> Find the cheapest sufficient workflow that can reliably solve the problem, prove that it works, and prove why it deserves to replace the alternatives.
 
-The coding model is not the authority. The repository, specifications, invariants, tests, policies, and acceptance rules are the authority. The harness exists to enforce that boundary.
+**Not a better agent. A scientifically governed system for discovering better ways to solve problems.**
 
-## The Four Pillars
+See [GOAL.md](GOAL.md) for the full destination statement.
 
-| Layer | Fundamental question | Goal |
-|-------|----------------------|------|
-| **Authoritative** | What must be true? | Define correctness, constraints, permissions, and acceptance |
-| **Verifier** | How do we know it is true? | Produce sufficient repository-aware evidence |
-| **Economics** | What is the least costly sufficient way to establish and sustain it? | Optimize total cost of correctness under mandatory floors |
-| **Observability** | How is the system performing over time? | Measure, attribute drift, and make adaptation empirical |
+---
 
-**Authority defines truth. Verification establishes truth. Economics determines the minimum sufficient cost of establishing truth. Observability tells us whether the system is consistently delivering it.**
+The coding model is not the authority. The repository, specifications, invariants, tests, policies, and acceptance rules are the authority. The harness exists to enforce that boundary and to search the space of workflows under explicit constraints.
+
+## The Four Pillars + North Star
+
+| Layer | Fundamental question |
+|-------|----------------------|
+| **[GOAL.md](GOAL.md)** | What is the cheapest sufficient, verifiably correct workflow? |
+| **Authoritative** | What must be true? |
+| **Verifier** | How do we know it is true? |
+| **Economics** | What is the least costly sufficient way to establish and sustain it? |
+| **Observability** | How is the system performing over time, and what should we adapt? |
 
 ## Authority Documents
 
 | Document | Purpose |
 |----------|---------|
+| [GOAL.md](GOAL.md) | Ultimate destination — workflow optimization under evidence |
 | [AGENTS.md](AGENTS.md) | Primary behavioral contract, five questions, and invariants |
 | [CONSTRAINTS.md](CONSTRAINTS.md) | Hard limits and non-negotiable policies |
 | [VERIFICATION.md](VERIFICATION.md) | Repository-aware hybrid verifier (three loops) |
@@ -34,15 +40,15 @@ These documents are the source of truth. Runtime code must enforce them.
 
 ## Core Properties
 
+- **Workflow optimization engine**: searches the space of candidate workflows under mandatory floors
 - **Authoritative governance**: resolve → constrain → execute → verify → decide
-- **Independent declaration of success**: the model that wrote the code does not get to declare completion
-- **Hybrid verification**: algorithmic checks + bounded agentic review under an explicit verification contract
-- **Three verification loops**: Agentic (semantic), CI (executable), Maintenance (repository health over time)
-- **Minimum Sufficient Harness**: every control must earn its place; cheapest sufficient path is selected at runtime
-- **Observability-driven adaptation**: trajectories + evals make control admission and removal empirical
-- **Hard limits**: at most two CI rounds; ≤ 1,000 net LOC per sprint; isolation boundary
-- **Model-agnostic**: any model that supports tool calling can be used; model selection is economically governed
-- **Full trajectory + Evidence Ledger**: every node and every claim is inspectable
+- **Independent declaration of success**: the model never declares completion
+- **Hybrid verification**: algorithmic + bounded agentic under explicit contracts
+- **Three verification loops**: Agentic, CI, Maintenance
+- **Minimum Sufficient Harness**: every control earns its place; cheapest sufficient path at runtime
+- **Observability-driven adaptation**: evidence makes control admission and removal empirical
+- **Models as replaceable resources**: competitive allocation of intelligence
+- **Evidence-backed claims**: optimality / dominance / Pareto efficiency within a defined search space
 
 ## The Five Questions the Harness Must Answer
 
@@ -55,34 +61,14 @@ These documents are the source of truth. Runtime code must enforce them.
 ## Quick Start (Conceptual)
 
 ```bash
-# Install
 pip install -e .
 
-# Run a governed coding task
 specialized-harness run \
   --blueprint standard-coding \
   --repo /path/to/monorepo \
   --task "Fix the flaky test in payments/invoice_test.rb" \
   --model <provider/model>
 ```
-
-## Repository Layout
-
-```
-specialized-harness/
-├── AGENTS.md, CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, OBSERVABILITY.md, ...
-├── blueprints/               # Concrete blueprint definitions
-├── src/specialized_harness/  # Engine, nodes, sandboxes, policy, verifier, economics, observability
-├── configs/                  # Monorepo overlays
-├── tests/                    # Unit, integration, blueprint regression
-└── docs/
-```
-
-## Design Intent
-
-This harness is intended for organizations that already possess strong local verification, selective CI, and a culture of human review when residual judgment is required. It does not attempt to replace human review as the final merge gate; it produces a process-compliant, independently verified change (or an explicit handoff) that is ready for that review.
-
-The reliability guarantees come from authority resolution, constraint, hybrid verification, independent decision, economic governance, and observability-driven adaptation — not from the model.
 
 ## License
 
