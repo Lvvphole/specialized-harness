@@ -1,14 +1,18 @@
-"""S6-1: optional propose context from evidence."""
+"""S6-1: optional propose context from evidence + tool protocol fields."""
 import json
 
-from specialized_harness.providers.context import build_propose_body
+from specialized_harness.providers.context import ALLOWED_TOOLS, build_propose_body
 from specialized_harness.providers.http import HttpAgentProvider
 from specialized_harness.providers.scripted import ScriptedProvider
 
 
 def test_build_body_minimal():
     body = build_propose_body("implement", {"task": "fix_add", "run_id": "r1"})
-    assert body == {"node_id": "implement", "task": "fix_add", "run_id": "r1"}
+    assert body["node_id"] == "implement"
+    assert body["task"] == "fix_add"
+    assert body["run_id"] == "r1"
+    assert body["round"] == 0
+    assert body["allowed_tools"] == list(ALLOWED_TOOLS)
 
 
 def test_build_body_with_evidence():
@@ -29,6 +33,22 @@ def test_build_body_with_evidence():
     assert body["last_ci_ok"] is False
     assert "FAILED" in body["last_ci_stdout"]
     assert body["loc_exceeded"] is False
+
+
+def test_build_body_tool_round_fields():
+    obs = [{"tool_call_id": "c1", "name": "read_file", "ok": True, "result": "x"}]
+    body = build_propose_body(
+        "implement",
+        {"task": "t", "run_id": "r", "task_brief": "Fix add"},
+        round=1,
+        observations=obs,
+        max_tool_rounds=8,
+    )
+    assert body["round"] == 1
+    assert body["max_tool_rounds"] == 8
+    assert body["observations"] == obs
+    assert body["task_brief"] == "Fix add"
+    assert body["allowed_tools"] == list(ALLOWED_TOOLS)
 
 
 def test_http_forwards_context():
@@ -54,6 +74,8 @@ def test_http_forwards_context():
     assert captured["body"]["last_ci_ok"] is False
     assert captured["body"]["last_ci_stdout"] == "boom"
     assert captured["body"]["net_loc"] == 3
+    assert captured["body"]["round"] == 0
+    assert "allowed_tools" in captured["body"]
 
 
 def test_scripted_still_works_with_extra_evidence():

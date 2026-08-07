@@ -38,3 +38,9 @@ class PolicyEnforcer:
                 "Incomplete trajectory detected. "
                 "Every node must emit a structured event (OBSERVABILITY.md)."
             )
+
+    def check_tool_rounds_config(self) -> None:
+        """Validate max_tool_rounds is a positive independent bound."""
+        n = int(self.policy.max_tool_rounds)
+        if n < 1:
+            raise PolicyViolation("max_tool_rounds must be >= 1")
