@@ -1,5 +1,6 @@
 """S4-1: per-node duration_ms and run total_ms (ECONOMICS.md scaffolding)."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.observability.persistence import load_run
 from specialized_harness.runner import run_fixture_task

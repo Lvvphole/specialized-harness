@@ -1,6 +1,7 @@
 """S5-2: HttpAgentProvider protocol + mocked HTTP; env default is Scripted."""
 import json
-from specialized_harness.providers.base import AgentProvider, AgentProposal
+
+from specialized_harness.providers.base import AgentProposal, AgentProvider
 from specialized_harness.providers.http import HttpAgentProvider, provider_from_env
 from specialized_harness.providers.scripted import ScriptedProvider
 

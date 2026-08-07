@@ -19,4 +19,6 @@ jobs:
       - name: Unit + integration
         run: pytest -v
       - name: Lint
-        run: pip install ruff && ruff check src tests
+        # ruff is pinned in the dev extra and installed by the step above;
+        # the rule set comes from [tool.ruff.lint] in pyproject.toml.
+        run: ruff check src tests

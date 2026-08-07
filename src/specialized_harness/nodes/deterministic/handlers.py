@@ -1,8 +1,9 @@
 """Deterministic node handlers (authority, verify, git, decide)."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from specialized_harness.engine.models import FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic import git_ops
@@ -116,6 +117,7 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
         }
         evidence = ctx.setdefault("evidence", {})
         evidence["last_ci_ok"] = result.ok
+        evidence["last_ci_stdout"] = (result.stdout or result.stderr or "")[:2000]
         ledger: EvidenceLedger | None = ctx.get("ledger")
         if ledger is not None:
             ledger.append(

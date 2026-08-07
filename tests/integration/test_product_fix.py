@@ -1,15 +1,16 @@
 """S3-1: ACCEPT depends on product code repair, not marker alone."""
 from pathlib import Path
+
+from specialized_harness.engine.blueprint_engine import BlueprintEngine
+from specialized_harness.engine.loader import load_blueprint
 from specialized_harness.engine.models import ExitStatus, FinalStatus
 from specialized_harness.nodes.deterministic.checks import run_pytest
-from specialized_harness.runner import run_fixture_task
+from specialized_harness.nodes.registry import make_fixture_handlers
+from specialized_harness.observability.ledger import EvidenceLedger
 from specialized_harness.providers.base import AgentProposal, FileMutation
 from specialized_harness.providers.scripted import ScriptedProvider
-from specialized_harness.engine.loader import load_blueprint
-from specialized_harness.engine.blueprint_engine import BlueprintEngine
-from specialized_harness.nodes.registry import make_fixture_handlers
+from specialized_harness.runner import run_fixture_task
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
-from specialized_harness.observability.ledger import EvidenceLedger
 
 ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / "blueprints" / "standard-coding.yaml"

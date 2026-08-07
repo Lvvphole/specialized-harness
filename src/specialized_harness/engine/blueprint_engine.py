@@ -5,9 +5,10 @@ especially any attempt to exceed max_ci_rounds.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 from uuid import uuid4
 
 from specialized_harness.engine.models import (
@@ -20,7 +21,6 @@ from specialized_harness.engine.models import (
     TrajectoryEvent,
 )
 from specialized_harness.policy.enforcer import PolicyEnforcer
-
 
 Handler = Callable[[dict[str, Any]], NodeResult]
 
@@ -107,7 +107,7 @@ class BlueprintEngine:
             self.enforcer.check_ci_round_allowed()
             self.policy.record_ci_round()
 
-        started = datetime.now(timezone.utc).isoformat()
+        started = datetime.now(UTC).isoformat()
         t0 = time.perf_counter()
         handler = self.handlers.get(handler_name) or self.handlers.get(node_id)
         if handler is None:
@@ -122,7 +122,7 @@ class BlueprintEngine:
                 "run_id": self.run_id,
             }
             result = handler(ctx)
-        finished = datetime.now(timezone.utc).isoformat()
+        finished = datetime.now(UTC).isoformat()
         duration_ms = int((time.perf_counter() - t0) * 1000)
 
         self.sequence += 1
@@ -156,7 +156,10 @@ class BlueprintEngine:
             "max_net_loc": self.policy.max_net_loc,
         }
         try:
-            return bool(eval(expr, {"__builtins__": {}}, env))  # noqa: S307
+            # Blueprint edge condition, evaluated with builtins stripped and only
+            # the policy counters above in scope. The expression comes from the
+            # blueprint, which is an authoritative source, not from the model.
+            return bool(eval(expr, {"__builtins__": {}}, env))
         except Exception:
             return False
 

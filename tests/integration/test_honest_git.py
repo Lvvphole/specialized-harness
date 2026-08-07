@@ -1,5 +1,6 @@
 """S3-2: git_push never claims remote success without a remote."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
 
