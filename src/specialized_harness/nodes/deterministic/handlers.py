@@ -15,11 +15,49 @@ from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSan
 Handler = Callable[[dict[str, Any]], NodeResult]
 
 
-def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
+def build_deterministic_handlers(
+    task_dir: Path,
+    *,
+    authority_mode: str = "fixture",
+) -> dict[str, Handler]:
     def resolve_authority(ctx: dict[str, Any]) -> NodeResult:
-        if not task_dir.exists():
-            return fail(f"Unknown fixture task: {task_dir.name}")
-        return ok(authority_sources=["fixture", str(task_dir)])
+        from specialized_harness.authority import resolve_task_authority
+
+        root = ctx.get("authority_root") or task_dir.parent
+        task = str(ctx.get("task") or task_dir.name)
+        allow_repo = bool(ctx.get("allow_repo_mode")) or authority_mode == "repo"
+        if authority_mode == "fixture" and not allow_repo:
+            if not task_dir.exists():
+                return fail(f"Unknown fixture task: {task_dir.name}")
+            sources = ["fixture", str(task_dir)]
+            ctx["authority"] = {
+                "mode": "fixture",
+                "root": str(task_dir),
+                "sources": sources,
+                "brief": None,
+            }
+            return ok(authority_sources=sources, authority_mode="fixture")
+
+        resolved = resolve_task_authority(
+            Path(ctx.get("authority_root") or root),
+            task,
+            task_brief=ctx.get("task_brief"),
+            allow_repo_mode=allow_repo,
+        )
+        if not resolved.ok:
+            return fail(resolved.error or "authority unresolved")
+        ctx["authority"] = {
+            "mode": resolved.mode,
+            "root": str(resolved.root),
+            "sources": list(resolved.sources),
+            "brief": resolved.brief,
+        }
+        if resolved.brief:
+            ctx["task_brief"] = resolved.brief
+        return ok(
+            authority_sources=list(resolved.sources),
+            authority_mode=resolved.mode,
+        )
 
     def constrain_scope(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
@@ -189,6 +227,6 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
         "run_local_verification": run_local_verification,
         "git_push": git_push,
         "selective_ci_and_verify_outcome": selective_ci_and_verify_outcome,
-        "selective_ci": selective_ci_and_verify_outcome,  # alias for engine policy checks
+        "selective_ci": selective_ci_and_verify_outcome,
         "decide_accept_or_handoff": decide_accept_or_handoff,
     }
