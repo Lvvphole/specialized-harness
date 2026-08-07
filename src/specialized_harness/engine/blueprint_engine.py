@@ -44,6 +44,7 @@ class BlueprintEngine:
                 policy_cfg.get("max_agentic_recovery_attempts", 1)
             ),
             max_net_loc=int(policy_cfg.get("max_net_loc", 1000)),
+            max_tool_rounds=int(policy_cfg.get("max_tool_rounds", 8)),
         )
         if self.policy.max_ci_rounds > 2:
             raise ValueError("Hard constraint: max_ci_rounds cannot exceed 2")
@@ -156,9 +157,6 @@ class BlueprintEngine:
             "max_net_loc": self.policy.max_net_loc,
         }
         try:
-            # Blueprint edge condition, evaluated with builtins stripped and only
-            # the policy counters above in scope. The expression comes from the
-            # blueprint, which is an authoritative source, not from the model.
             return bool(eval(expr, {"__builtins__": {}}, env))
         except Exception:
             return False

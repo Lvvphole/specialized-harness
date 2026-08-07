@@ -41,6 +41,8 @@ class PolicyState:
     max_agentic_recovery_attempts: int = 1
     net_loc: int = 0
     max_net_loc: int = 1000
+    # Independent of max_ci_rounds; enforced inside HttpAgentProvider.propose.
+    max_tool_rounds: int = 8
 
     def can_start_ci_round(self) -> bool:
         return self.ci_rounds < self.max_ci_rounds

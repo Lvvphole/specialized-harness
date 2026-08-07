@@ -33,6 +33,9 @@ def validate_blueprint(bp: dict[str, Any]) -> None:
     max_ci = int(policy.get("max_ci_rounds", 2))
     if max_ci > 2:
         raise ValueError("Hard constraint: max_ci_rounds cannot exceed 2")
+    max_tool = int(policy.get("max_tool_rounds", 8))
+    if max_tool < 1:
+        raise ValueError("max_tool_rounds must be >= 1")
     nodes = spec["nodes"]
     if not nodes:
         raise ValueError("Blueprint contains no nodes")
