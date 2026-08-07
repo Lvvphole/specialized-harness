@@ -6,6 +6,8 @@ from typing import Any, Callable
 
 from specialized_harness.engine.models import ExitStatus, FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic.checks import run_pytest, syntax_check
+from specialized_harness.nodes.deterministic.loc import measure_net_loc
+from specialized_harness.policy.enforcer import PolicyEnforcer, PolicyViolation
 from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
 
 Handler = Callable[[dict[str, Any]], NodeResult]
@@ -57,14 +59,27 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
             marker = sandbox.resolve("harness_impl_marker.txt")
             marker.write_text(f"implemented-by:{ctx.get('run_id', 'unknown')}\n")
             files_changed.append("harness_impl_marker.txt")
+            if ctx.get("task") == "over_loc":
+                bulk = sandbox.resolve("bulk_generated.py")
+                bulk.write_text("\n".join(f"# line {i}" for i in range(1200)) + "\n")
+                files_changed.append("bulk_generated.py")
         except WorkspaceError as e:
             return _fail(str(e))
-        ctx["policy"].net_loc = len(files_changed)
-        return _ok(
-            files_changed=files_changed,
-            net_loc=ctx["policy"].net_loc,
-            workspace=str(sandbox.root),
-        )
+        net = measure_net_loc(sandbox.baseline_snapshot, sandbox.root)
+        ctx["policy"].net_loc = net
+        evidence = ctx.setdefault("evidence", {})
+        evidence["net_loc"] = net
+        meta = {
+            "files_changed": files_changed,
+            "net_loc": net,
+            "workspace": str(sandbox.root),
+        }
+        try:
+            PolicyEnforcer(ctx["policy"]).check_loc_allowed(net)
+        except PolicyViolation as e:
+            evidence["loc_exceeded"] = True
+            return _fail(str(e), **meta)
+        return _ok(**meta)
 
     def run_local_verification(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
@@ -109,15 +124,25 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return selective_ci_and_verify_outcome(ctx)
 
     def fix_ci_failures(ctx: dict[str, Any]) -> NodeResult:
-        # Scripted: does not repair always_fail_ci; re-push will fail CI again
         return _ok(attempted_fix=True)
 
     def decide_accept_or_handoff(ctx: dict[str, Any]) -> NodeResult:
-        """Independent declaration: based on CI evidence + policy counters only."""
+        """Independent declaration: CI evidence + LOC policy + counters (not the model)."""
         policy = ctx["policy"]
-        last_ok = ctx.get("evidence", {}).get("last_ci_ok")
+        evidence = ctx.get("evidence", {})
+        if evidence.get("loc_exceeded"):
+            return _ok(
+                final_status=FinalStatus.FAILED.value,
+                reason="net_loc exceeded max_net_loc",
+                net_loc=evidence.get("net_loc"),
+            )
+        last_ok = evidence.get("last_ci_ok")
         if last_ok is True:
-            return _ok(final_status=FinalStatus.ACCEPT.value, last_ci_ok=True)
+            return _ok(
+                final_status=FinalStatus.ACCEPT.value,
+                last_ci_ok=True,
+                net_loc=evidence.get("net_loc"),
+            )
         if last_ok is False and policy.ci_rounds >= policy.max_ci_rounds:
             return _ok(final_status=FinalStatus.HUMAN_HANDOFF.value, last_ci_ok=False)
         if last_ok is False:
