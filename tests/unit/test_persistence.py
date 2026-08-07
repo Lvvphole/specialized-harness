@@ -47,3 +47,12 @@ def test_round_trip(tmp_path: Path):
 def test_serialize_includes_sequence():
     data = serialize_run(_sample_result())
     assert data["trajectory"][0]["sequence"] == 1
+
+
+def test_serialize_includes_total_and_duration():
+    r = _sample_result()
+    r.trajectory[0].duration_ms = 12
+    r.total_ms = 12
+    data = serialize_run(r)
+    assert data["total_ms"] == 12
+    assert data["trajectory"][0]["duration_ms"] == 12
