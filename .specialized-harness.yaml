@@ -1,0 +1,6 @@
+# Default operator/vibe-coder settings for this repo (CLI v1).
+# Override per-run with flags or HARNESS_PROVIDER / HARNESS_PROVIDER_URL.
+blueprint: blueprints/standard-coding.yaml
+fixture_root: fixtures
+provider: scripted
+runs_dir: artifacts/runs
