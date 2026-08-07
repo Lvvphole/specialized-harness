@@ -18,6 +18,7 @@ REQUIRED = {
 }
 
 
-def test_handler_map_keys():
-    m = make_fixture_handlers(Path("/tmp"), "fix_add")
-    assert REQUIRED.issubset(set(m.keys()))
+def test_handler_map_keys(tmp_path: Path):
+    (tmp_path / "t").mkdir()
+    h = make_fixture_handlers(tmp_path, "t")
+    assert REQUIRED.issubset(h.keys())
