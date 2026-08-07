@@ -7,8 +7,11 @@ from typing import Any, Callable
 from specialized_harness.engine.models import ExitStatus, FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic.checks import run_pytest, syntax_check
 from specialized_harness.nodes.deterministic.loc import measure_net_loc
+from specialized_harness.nodes.agentic.apply import apply_proposal
 from specialized_harness.observability.ledger import EvidenceLedger, Verdict
 from specialized_harness.policy.enforcer import PolicyEnforcer, PolicyViolation
+from specialized_harness.providers.base import AgentProvider
+from specialized_harness.providers.scripted import ScriptedProvider
 from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
 
 Handler = Callable[[dict[str, Any]], NodeResult]
@@ -49,21 +52,20 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
     def plan(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
         ws = str(sandbox.root) if sandbox and sandbox.root else ""
-        return _ok(plan="fixture plan", workspace=ws)
+        provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        proposal = provider.propose("plan", ctx)
+        return _ok(plan=proposal.plan_summary or "plan", workspace=ws)
 
     def implement(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
-        files_changed: list[str] = []
         if sandbox is None or sandbox.root is None:
             return _fail("Workspace not provisioned before implement")
+        provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        proposal = provider.propose("implement", ctx)
+        if proposal.error:
+            return _fail(proposal.error)
         try:
-            marker = sandbox.resolve("harness_impl_marker.txt")
-            marker.write_text(f"implemented-by:{ctx.get('run_id', 'unknown')}\n")
-            files_changed.append("harness_impl_marker.txt")
-            if ctx.get("task") == "over_loc":
-                bulk = sandbox.resolve("bulk_generated.py")
-                bulk.write_text("\n".join(f"# line {i}" for i in range(1200)) + "\n")
-                files_changed.append("bulk_generated.py")
+            files_changed = apply_proposal(sandbox, proposal)
         except WorkspaceError as e:
             return _fail(str(e))
         net = measure_net_loc(sandbox.baseline_snapshot, sandbox.root)
@@ -74,6 +76,7 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
             "files_changed": files_changed,
             "net_loc": net,
             "workspace": str(sandbox.root),
+            "provider": type(provider).__name__,
         }
         ledger: EvidenceLedger | None = ctx.get("ledger")
         try:
@@ -162,7 +165,20 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return selective_ci_and_verify_outcome(ctx)
 
     def fix_ci_failures(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(attempted_fix=True)
+        provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        proposal = provider.propose("fix_ci_failures", ctx)
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        files_changed: list[str] = []
+        if sandbox and sandbox.root and proposal.mutations:
+            try:
+                files_changed = apply_proposal(sandbox, proposal)
+            except WorkspaceError as e:
+                return _fail(str(e))
+        return _ok(
+            attempted_fix=True,
+            files_changed=files_changed,
+            plan=proposal.plan_summary,
+        )
 
     def decide_accept_or_handoff(ctx: dict[str, Any]) -> NodeResult:
         """Independent declaration from ledger claims + policy counters (not the model)."""
