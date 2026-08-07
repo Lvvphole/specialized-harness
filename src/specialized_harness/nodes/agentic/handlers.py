@@ -71,9 +71,18 @@ def build_agentic_handlers() -> dict[str, Handler]:
         if inspect is not None:
             meta["tools_called"] = inspect.tools_called()
             meta["tool_observations"] = inspect.observations()
+        # Provider-level multi-round accounting (HTTP tool protocol)
+        prov_tools = proposal.metadata.get("tools_called") or []
+        if prov_tools and not meta.get("tools_called"):
+            meta["tools_called"] = list(prov_tools)
+        elif prov_tools and meta.get("tools_called"):
+            meta.setdefault("provider_tools_called", list(prov_tools))
         tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
         if tokens:
             meta["token_usage"] = tokens
+        for k in ("http_rounds", "total_http_ms", "tool_rounds"):
+            if k in proposal.metadata:
+                meta[k] = proposal.metadata[k]
         ledger: EvidenceLedger | None = ctx.get("ledger")
         try:
             PolicyEnforcer(ctx["policy"]).check_loc_allowed(net)
