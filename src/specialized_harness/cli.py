@@ -13,9 +13,6 @@ from specialized_harness.observability.persistence import load_run
 from specialized_harness.providers.http import resolve_provider
 from specialized_harness.runner import run_fixture_task
 
-# Errors that mean "the operator asked for something impossible", not "the
-# harness broke". These are reported as a one-line message; anything else keeps
-# its traceback, because an unexpected exception is an infrastructure failure.
 USAGE_ERRORS = (ValueError, FileNotFoundError)
 
 
@@ -40,6 +37,7 @@ def _resolve_run_args(args: argparse.Namespace, cfg) -> dict:
             + "; ".join(missing)
             + "\n(hint: add a .specialized-harness.yaml or pass flags)"
         )
+    allow_repo_mode = bool(getattr(args, "repo", None))
     return {
         "task": task,
         "blueprint": blueprint,
@@ -47,6 +45,7 @@ def _resolve_run_args(args: argparse.Namespace, cfg) -> dict:
         "provider": provider,
         "provider_url": provider_url,
         "runs_dir": runs_dir,
+        "allow_repo_mode": allow_repo_mode,
     }
 
 
@@ -69,13 +68,13 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="Task name (shortcut for --task)",
     )
-    run_p.add_argument("--task", default=None, help="Task / fixture name")
+    run_p.add_argument("--task", default=None, help="Task / fixture name or brief")
     run_p.add_argument("--blueprint", default=None)
     run_p.add_argument("--fixture-root", default=None)
     run_p.add_argument(
         "--repo",
         default=None,
-        help="Repo or fixture root (alias of --fixture-root)",
+        help="Repo root (enables repo authority mode: task string is the brief)",
     )
     run_p.add_argument(
         "--provider",
@@ -113,8 +112,6 @@ def main(argv: list[str] | None = None) -> int:
         try:
             cfg = load_config(args.config)
             resolved = _resolve_run_args(args, cfg)
-            # Resolved here rather than inside the runner so an unknown provider
-            # or a missing provider URL is reported before any run starts.
             provider = resolve_provider(
                 provider=resolved["provider"],
                 provider_url=resolved["provider_url"],
@@ -127,6 +124,7 @@ def main(argv: list[str] | None = None) -> int:
             resolved["task"],
             runs_dir=resolved["runs_dir"],
             provider=provider,
+            allow_repo_mode=resolved.get("allow_repo_mode", False),
         )
         claims: list = []
         run_json = Path(resolved["runs_dir"]) / result.run_id / "run.json"
@@ -164,8 +162,6 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "metrics":
         try:
-            # `run` writes to config.runs_dir, so `metrics` must read from the
-            # same place or it silently reports on a directory nobody wrote to.
             runs_dir = args.runs_dir or load_config(args.config).runs_dir
         except USAGE_ERRORS as e:
             raise SystemExit(f"error: {e}") from e
