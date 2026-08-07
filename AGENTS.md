@@ -5,7 +5,7 @@
 **Last Updated**: 2026-08-06  
 **Scope**: Authoritative coding-agent harness — deterministic governance of probabilistic generation
 
-This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, VERIFICATION.md, BLUEPRINTS.md, OBSERVABILITY.md, SECURITY.md) are subordinate to the invariants defined here.
+This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, BLUEPRINTS.md, OBSERVABILITY.md, SECURITY.md) are subordinate to the invariants defined here.
 
 ---
 
@@ -79,7 +79,7 @@ A strong authoritative harness optimizes approximately:
 \text{Harness Value} = \frac{\text{Correct Accepted Outcomes} \times \text{Failure Containment}}{\text{Latency} \times \text{Cost} \times \text{Added Failure Surface}}
 \]
 
-Every control must earn its place by measurably improving correctness, containment, or authority enforcement. The harness itself must not become a larger, slower, or more expensive failure surface than the coding task it governs.
+Every control must earn its place by measurably improving correctness, containment, or authority enforcement. The harness itself must not become a larger, slower, or more expensive failure surface than the coding task it governs. See ECONOMICS.md for the full total-cost-of-correctness formulation and the Minimum Sufficient Harness Principle.
 
 ---
 
@@ -105,7 +105,7 @@ The model that generated the implementation does not get to declare completion. 
 - explicit human escalation when residual judgment is required.
 
 ### 2.6 Minimum Sufficient Control Surface
-Every additional control, node, tool, or policy layer must demonstrably improve correctness, containment, or authority enforcement. Complexity that does not improve the value function is rejected.
+Every additional control, node, tool, or policy layer must demonstrably improve correctness, containment, or authority enforcement. Complexity that does not improve the value function is rejected. See ECONOMICS.md for control admission, runtime admission, and the rational stopping rule.
 
 ### Supporting Process Invariants
 
@@ -177,14 +177,14 @@ A run is complete only when the above conditions are met or when an explicit hum
 
 ## 6. Model Independence
 
-This harness is deliberately model-agnostic. Any model that can follow tool-calling conventions and produce structured outputs may be used. Reliability guarantees derive from the harness (authority resolution, constraint, verification, and independent decision), not from model capability.
+This harness is deliberately model-agnostic. Any model that can follow tool-calling conventions and produce structured outputs may be used. Reliability guarantees derive from the harness (authority resolution, constraint, verification, and independent decision), not from model capability. Model selection itself is governed by the cheapest-sufficient-source-of-competence principle in ECONOMICS.md.
 
 ---
 
 ## 7. Authority Hierarchy
 
 1. This file (AGENTS.md)
-2. CONSTRAINTS.md and VERIFICATION.md (parallel; both subordinate only to AGENTS.md)
+2. CONSTRAINTS.md, VERIFICATION.md, and ECONOMICS.md (parallel; subordinate only to AGENTS.md)
 3. ARCHITECTURE.md
 4. BLUEPRINTS.md + individual blueprint definitions
 5. Runtime configuration and monorepo-specific overlays
