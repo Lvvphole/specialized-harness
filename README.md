@@ -17,6 +17,7 @@ The coding model is not the authority. The repository, specifications, invariant
 
 ## Contents
 
+- [Who it's for](#who-its-for)
 - [What the harness does](#what-the-harness-does)
 - [Install](#install)
 - [Quick start](#quick-start)
@@ -30,6 +31,17 @@ The coding model is not the authority. The repository, specifications, invariant
 - [Sprint history](#sprint-history)
 - [Status and non-goals](#status-and-non-goals)
 - [License](#license)
+
+---
+
+## Who it's for
+
+The harness is for **both**:
+
+- **Engineers / operators** — need repository-conformant changes, enforceable policy, and evidence (trajectory, claims, ACCEPT / HUMAN_HANDOFF / FAILED).
+- **Vibe coders** — want deterministic-feeling workflows and clean, verified code with a clear outcome, without treating the model as the source of truth.
+
+Same governed path for both: the model proposes; the harness constrains, verifies, and decides. UX should make that path easy to start and inspect — not replace independent acceptance with a chat transcript. See [AGENTS.md](AGENTS.md) (*Who this serves*).
 
 ---
 
