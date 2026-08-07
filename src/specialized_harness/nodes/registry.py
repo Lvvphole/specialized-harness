@@ -1,10 +1,11 @@
-"""Node handler registry - fixture-driven for Sprint 1."""
+"""Node handler registry - fixture-driven with disposable workspace (Sprint 2)."""
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Callable
 
 from specialized_harness.engine.models import ExitStatus, FinalStatus, NodeResult
+from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
 
 Handler = Callable[[dict[str, Any]], NodeResult]
 
@@ -18,8 +19,8 @@ def _fail(error: str, **meta: Any) -> NodeResult:
 
 
 def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
-    """Handlers driven by fixture task name for accept / handoff proofs."""
-    task_dir = fixture_root / task
+    """Handlers driven by fixture task; mutations target the sandbox workspace only."""
+    task_dir = (fixture_root / task).resolve()
     fail_ci = task == "always_fail_ci"
 
     def resolve_authority(ctx: dict[str, Any]) -> NodeResult:
@@ -28,20 +29,47 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return _ok(authority_sources=["fixture", str(task_dir)])
 
     def constrain_scope(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(allowed_paths=[str(task_dir)])
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        allowed = [str(sandbox.root)] if sandbox and sandbox.root else [str(task_dir)]
+        return _ok(allowed_paths=allowed)
 
     def provision_sandbox(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(sandbox=str(task_dir))
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        if sandbox is None:
+            return _fail("No WorkspaceSandbox in context")
+        try:
+            root = sandbox.provision()
+        except WorkspaceError as e:
+            return _fail(str(e))
+        return _ok(sandbox=str(root), workspace=str(root))
 
     def plan(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(plan="fixture plan")
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        ws = str(sandbox.root) if sandbox and sandbox.root else ""
+        return _ok(plan="fixture plan", workspace=ws)
 
     def implement(ctx: dict[str, Any]) -> NodeResult:
-        ctx["policy"].net_loc = 12
-        return _ok(files_changed=["src/app.py"], net_loc=12)
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        files_changed: list[str] = []
+        if sandbox is None or sandbox.root is None:
+            return _fail("Workspace not provisioned before implement")
+        try:
+            marker = sandbox.resolve("harness_impl_marker.txt")
+            marker.write_text(f"implemented-by:{ctx.get('run_id', 'unknown')}\n")
+            files_changed.append("harness_impl_marker.txt")
+        except WorkspaceError as e:
+            return _fail(str(e))
+        ctx["policy"].net_loc = len(files_changed)
+        return _ok(
+            files_changed=files_changed,
+            net_loc=ctx["policy"].net_loc,
+            workspace=str(sandbox.root),
+        )
 
     def run_local_verification(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(checks=["lint", "typecheck"])
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        ws = str(sandbox.root) if sandbox and sandbox.root else ""
+        return _ok(checks=["lint", "typecheck"], workspace=ws)
 
     def run_local_linters(ctx: dict[str, Any]) -> NodeResult:
         return run_local_verification(ctx)
