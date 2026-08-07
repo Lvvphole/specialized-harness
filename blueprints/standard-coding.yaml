@@ -9,6 +9,7 @@ spec:
     max_ci_rounds: 2
     max_agentic_recovery_attempts: 1
     max_net_loc: 1000
+    max_tool_rounds: 8
     require_trajectory: true
     require_authority_resolution: true
   nodes:
@@ -61,10 +62,6 @@ spec:
     - from: local_verify
       to: push
       "on": success
-    - from: local_verify
-      to: implement
-      "on": failure
-      when: recovery_attempts < max_agentic_recovery_attempts
     - from: push
       to: ci_round
       "on": success
@@ -75,10 +72,16 @@ spec:
       to: fix_ci
       "on": failure
       when: ci_rounds < max_ci_rounds
+    - from: fix_ci
+      to: ci_round
+      "on": success
     - from: ci_round
       to: decide
       "on": failure
       when: ci_rounds >= max_ci_rounds
-    - from: fix_ci
-      to: push
-      "on": success
+    - from: resolve_authority
+      to: decide
+      "on": failure
+    - from: implement
+      to: decide
+      "on": failure
