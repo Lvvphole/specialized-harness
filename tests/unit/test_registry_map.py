@@ -1,5 +1,6 @@
 """Public handler map keys for blueprint + engine aliases."""
 from pathlib import Path
+
 from specialized_harness.nodes.registry import make_fixture_handlers
 
 REQUIRED = {
@@ -17,7 +18,6 @@ REQUIRED = {
 }
 
 
-def test_handler_map_keys(tmp_path: Path):
-    (tmp_path / "t").mkdir()
-    h = make_fixture_handlers(tmp_path, "t")
-    assert REQUIRED.issubset(h.keys())
+def test_handler_map_keys():
+    m = make_fixture_handlers(Path("/tmp"), "fix_add")
+    assert REQUIRED.issubset(set(m.keys()))
