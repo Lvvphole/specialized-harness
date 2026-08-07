@@ -208,7 +208,9 @@ def test_http_multi_round_e2e_accept():
         "provider": HttpAgentProvider("http://mock/tools", opener=opener),
     }
     try:
-        result = BlueprintEngine(bp, handlers, run_id="http-tools-e2e", context=ctx).run()
+        result = BlueprintEngine(
+            bp, handlers, run_id="http-tools-e2e", context=ctx
+        ).run()
     finally:
         sandbox.teardown()
     assert result.final_status == FinalStatus.ACCEPT
@@ -222,4 +224,4 @@ def test_http_multi_round_e2e_accept():
 def test_policy_max_tool_rounds_from_blueprint():
     bp = load_blueprint(BP)
     assert bp["spec"]["policy"]["max_tool_rounds"] == 8
-    assert bp["spec"]["policy"]["max_ci_rounds"] == 2  # independent
+    assert bp["spec"]["policy"]["max_ci_rounds"] == 2

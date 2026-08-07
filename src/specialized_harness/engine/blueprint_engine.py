@@ -157,9 +157,6 @@ class BlueprintEngine:
             "max_net_loc": self.policy.max_net_loc,
         }
         try:
-            # Blueprint edge condition, evaluated with builtins stripped and only
-            # the policy counters above in scope. The expression comes from the
-            # blueprint, which is an authoritative source, not from the model.
             return bool(eval(expr, {"__builtins__": {}}, env))
         except Exception:
             return False
