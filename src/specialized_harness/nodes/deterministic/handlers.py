@@ -116,6 +116,7 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
         }
         evidence = ctx.setdefault("evidence", {})
         evidence["last_ci_ok"] = result.ok
+        evidence["last_ci_stdout"] = (result.stdout or result.stderr or "")[:2000]
         ledger: EvidenceLedger | None = ctx.get("ledger")
         if ledger is not None:
             ledger.append(
