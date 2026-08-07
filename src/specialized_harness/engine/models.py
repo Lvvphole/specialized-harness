@@ -1,8 +1,6 @@
 """Shared runtime models for the blueprint engine."""
 from __future__ import annotations
 
-import hashlib
-import json
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -78,10 +76,6 @@ class TrajectoryEvent:
     error: str | None
     metadata: dict[str, Any]
     duration_ms: int = 0
-
-    def canonical_hash(self) -> str:
-        payload = json.dumps(self.__dict__, sort_keys=True, default=str)
-        return hashlib.sha256(payload.encode()).hexdigest()
 
 
 @dataclass

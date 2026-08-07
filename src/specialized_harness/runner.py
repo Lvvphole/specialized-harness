@@ -59,13 +59,3 @@ def run_fixture_task(
     finally:
         if teardown:
             sandbox.teardown()
-
-
-def run_with_handlers(
-    blueprint: dict[str, Any],
-    handlers: dict,
-    context: dict[str, Any] | None = None,
-    run_id: str | None = None,
-) -> RunResult:
-    engine = BlueprintEngine(blueprint, handlers, run_id=run_id, context=context or {})
-    return engine.run()
