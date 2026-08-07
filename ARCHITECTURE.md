@@ -49,19 +49,81 @@ The model never decides whether a required engineering step occurs, whether an i
 
 ## 2. High-Level Component Diagram
 
-(See prior revisions for full ASCII diagram; structure unchanged.)
+```
+┌────────────────────────────────────────────────────────────────┐
+│                        Invocation Surfaces                      │
+│              (CLI · GitHub Action · Slack · API)                │
+└───────────────────────────────┬──────────────────────────────────┘
+                             │
+                             ▼
+┌────────────────────────────────────────────────────────────────┐
+│                      Blueprint Engine                           │
+│   (state machine that owns phase transitions and policy state)  │
+└───────────┬────────────────────────────────────┬────────────────────┘
+             │                               │
+             ▼                               ▼
+┌───────────────────────┐     ┌───────────────────────────┐
+│   Deterministic Nodes  │     │      Agentic Nodes         │
+│  • resolve_authority   │     │  • plan                    │
+│  • constrain_scope     │     │  • implement               │
+│  • lint / type-check   │     │  • fix_ci_failures         │
+│  • selective_ci        │     │                            │
+│  • verify_outcome      │     │                            │
+│  • policy_enforcer     │     │                            │
+│  • decide_accept       │     │                            │
+└───────────┬───────────┘     └───────────┬──────────────┘
+             │                               │
+             └──────────────┬──────────────┘
+                             │
+                             ▼
+┌────────────────────────────────────────────────────────────────┐
+│                     Execution Environment                       │
+│   Devbox Manager  ·  Sandbox Isolation  ·  Trajectory Logger    │
+└────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 3. Core Components
 
-Blueprint Engine, Deterministic Nodes, Agentic Nodes, Sandbox Manager, Trajectory layer, and Policy Enforcer — as defined in AGENTS.md and CONSTRAINTS.md. Unchanged by repository governance rules except as noted in §7.
+### 3.1 Blueprint Engine
+- Loads and validates a blueprint definition.
+- Maintains phase state and policy counters (CI rounds, recovery attempts, LOC budget).
+- Dispatches nodes according to edges and exit status.
+- Refuses any transition that would violate AGENTS.md or CONSTRAINTS.md.
+
+### 3.2 Deterministic Nodes
+Pure (or near-pure) functions that always execute when reached, return structured results, never call a language model, and are unit-testable in isolation.
+
+### 3.3 Agentic Nodes
+Receive a restricted tool surface; may propose implementations; cannot declare success or expand authority.
+
+### 3.4 Devbox / Sandbox Manager
+Provisions isolated, disposable environments with no production network access.
+
+### 3.5 Trajectory & Observability Layer
+Every node emits a structured event; trajectories are content-addressed and immutable.
+
+### 3.6 Policy Enforcer
+Last line of defense; enforces independent declaration of success.
 
 ---
 
 ## 4. Runtime Flow (Standard Coding Blueprint)
 
-resolve_authority → constrain_scope → provision → plan → implement → local_verify → push → ci_round → (fix_ci) → decide → teardown
+1. Invocation — Task specification received.
+2. Resolve Authority (deterministic).
+3. Constrain Scope (deterministic).
+4. Provision — Sandbox created.
+5. Plan (agentic).
+6. Implement (agentic).
+7. Local Verification (deterministic).
+8. Push (deterministic) — local only unless remote configured.
+9. CI Round 1 (deterministic).
+10. Fix CI (agentic, optional).
+11. CI Round 2 (deterministic, final).
+12. Decide (deterministic) — Accept or human handoff.
+13. Teardown.
 
 ---
 
@@ -73,7 +135,7 @@ Monorepo-specific behavior is supplied through configs overlays, conditional rul
 
 ## 6. Extension Points
 
-New nodes and blueprints must respect AGENTS.md and CONSTRAINTS.md hard invariants.
+New nodes and blueprints must respect AGENTS.md and CONSTRAINTS.md hard invariants. Model providers are pluggable.
 
 ---
 
