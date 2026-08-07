@@ -10,6 +10,7 @@ from specialized_harness.engine.loader import load_blueprint
 from specialized_harness.engine.models import RunResult
 from specialized_harness.nodes.registry import make_fixture_handlers
 from specialized_harness.observability.ledger import EvidenceLedger
+from specialized_harness.observability.persistence import persist_run
 from specialized_harness.providers.scripted import ScriptedProvider
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
 
@@ -21,6 +22,8 @@ def run_fixture_task(
     run_id: str | None = None,
     *,
     teardown: bool = True,
+    persist: bool = True,
+    runs_dir: str | Path | None = None,
 ) -> RunResult:
     """Run a blueprint against a fixture task inside a disposable workspace."""
     bp = load_blueprint(blueprint_path)
@@ -44,6 +47,14 @@ def run_fixture_task(
                 (result.error or "")
                 + " | isolation violation: fixture source mutated"
             ).strip(" |")
+        if persist:
+            ledger = context.get("ledger")
+            persist_run(
+                result,
+                ledger if isinstance(ledger, EvidenceLedger) else None,
+                runs_dir=runs_dir,
+                extra={"task": task},
+            )
         return result
     finally:
         if teardown:
