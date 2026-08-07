@@ -1,6 +1,7 @@
 """Offline eval contracts — AGENTS.md §4 outcomes (no live model).
 
-Reproducible ACCEPT / HANDOFF / FAILED without network. Seed eval corpus.
+These are the harness effectiveness floor: reproducible ACCEPT / HANDOFF / FAILED
+without network. Seed eval corpus (OBSERVABILITY.md).
 """
 from pathlib import Path
 

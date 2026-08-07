@@ -56,6 +56,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
+          CODEX_REVIEW_MODEL: ${{ vars.CODEX_REVIEW_MODEL }}
         run: python scripts/codex_pr_review.py /tmp/pr.bounded.diff
 
       - name: Post review comment
