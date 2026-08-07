@@ -1,19 +1,11 @@
-"""
-Policy Enforcer — last line of defense against constraint violations.
-
-This component is consulted before any phase transition that could
-violate the hard limits in CONSTRAINTS.md and AGENTS.md.
-"""
-
+"""Policy Enforcer — last line of defense against constraint violations."""
 from __future__ import annotations
 
-from typing import Optional
-from specialized_harness.engine.blueprint_engine import PolicyState
+from specialized_harness.engine.models import PolicyState
 
 
 class PolicyViolation(Exception):
     """Raised when a hard constraint is about to be broken."""
-    pass
 
 
 class PolicyEnforcer:
@@ -32,6 +24,12 @@ class PolicyEnforcer:
             raise PolicyViolation(
                 f"Recovery attempt limit exceeded "
                 f"(max={self.policy.max_agentic_recovery_attempts})."
+            )
+
+    def check_loc_allowed(self, net_loc: int) -> None:
+        if net_loc > self.policy.max_net_loc:
+            raise PolicyViolation(
+                f"Net LOC {net_loc} exceeds max_net_loc={self.policy.max_net_loc}."
             )
 
     def require_trajectory_complete(self, event_count: int, expected_min: int) -> None:
