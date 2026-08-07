@@ -24,6 +24,7 @@ def serialize_run(
         if hasattr(result.final_status, "value")
         else str(result.final_status),
         "error": result.error,
+        "total_ms": result.total_ms,
         "trajectory": [
             {
                 "run_id": e.run_id,
@@ -44,6 +45,7 @@ def serialize_run(
                 "artifacts": e.artifacts,
                 "error": e.error,
                 "metadata": e.metadata,
+                "duration_ms": e.duration_ms,
             }
             for e in result.trajectory
         ],
