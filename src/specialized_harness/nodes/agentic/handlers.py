@@ -12,6 +12,7 @@ from specialized_harness.observability.ledger import EvidenceLedger, Verdict
 from specialized_harness.policy.enforcer import PolicyEnforcer, PolicyViolation
 from specialized_harness.providers.base import AgentProvider
 from specialized_harness.providers.scripted import ScriptedProvider
+from specialized_harness.providers.tokens import normalize_token_usage
 from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
 
 Handler = Callable[[dict[str, Any]], NodeResult]
@@ -23,7 +24,11 @@ def build_agentic_handlers() -> dict[str, Handler]:
         ws = str(sandbox.root) if sandbox and sandbox.root else ""
         provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
         proposal = provider.propose("plan", ctx)
-        return ok(plan=proposal.plan_summary or "plan", workspace=ws)
+        meta = {"plan": proposal.plan_summary or "plan", "workspace": ws}
+        tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
+        if tokens:
+            meta["token_usage"] = tokens
+        return ok(**meta)
 
     def implement(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
@@ -47,6 +52,9 @@ def build_agentic_handlers() -> dict[str, Handler]:
             "workspace": str(sandbox.root),
             "provider": type(provider).__name__,
         }
+        tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
+        if tokens:
+            meta["token_usage"] = tokens
         ledger: EvidenceLedger | None = ctx.get("ledger")
         try:
             PolicyEnforcer(ctx["policy"]).check_loc_allowed(net)
@@ -81,11 +89,15 @@ def build_agentic_handlers() -> dict[str, Handler]:
                 files_changed = apply_proposal(sandbox, proposal)
             except WorkspaceError as e:
                 return fail(str(e))
-        return ok(
-            attempted_fix=True,
-            files_changed=files_changed,
-            plan=proposal.plan_summary,
-        )
+        fix_meta = {
+            "attempted_fix": True,
+            "files_changed": files_changed,
+            "plan": proposal.plan_summary,
+        }
+        tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
+        if tokens:
+            fix_meta["token_usage"] = tokens
+        return ok(**fix_meta)
 
     return {
         "plan": plan,

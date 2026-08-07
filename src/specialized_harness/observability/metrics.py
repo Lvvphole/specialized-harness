@@ -19,6 +19,7 @@ class RunMetricsSummary:
     claim_pass: dict[str, int] = field(default_factory=dict)
     claim_fail: dict[str, int] = field(default_factory=dict)
     run_ids: list[str] = field(default_factory=list)
+    mean_total_tokens: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = asdict(self)
@@ -39,6 +40,7 @@ def summarize_runs_dir(runs_dir: Path | str) -> RunMetricsSummary:
         return summary
 
     totals_ms: list[int] = []
+    totals_tokens: list[int] = []
     paths = sorted(root.glob("*/run.json"))
     for path in paths:
         data = load_run(path)
@@ -56,6 +58,17 @@ def summarize_runs_dir(runs_dir: Path | str) -> RunMetricsSummary:
             summary.other += 1
         if "total_ms" in data and data["total_ms"] is not None:
             totals_ms.append(int(data["total_ms"]))
+        run_tokens = 0
+        for ev in data.get("trajectory") or []:
+            tu = ev.get("token_usage") or {}
+            if isinstance(tu, dict):
+                for v in tu.values():
+                    try:
+                        run_tokens += int(v)
+                    except (TypeError, ValueError):
+                        pass
+        if run_tokens:
+            totals_tokens.append(run_tokens)
         for claim in data.get("claims") or []:
             cid = str(claim.get("claim_id", "unknown"))
             verdict = str(claim.get("verdict", "")).upper()
@@ -66,4 +79,6 @@ def summarize_runs_dir(runs_dir: Path | str) -> RunMetricsSummary:
 
     if totals_ms:
         summary.mean_total_ms = sum(totals_ms) / len(totals_ms)
+    if totals_tokens:
+        summary.mean_total_tokens = sum(totals_tokens) / len(totals_tokens)
     return summary

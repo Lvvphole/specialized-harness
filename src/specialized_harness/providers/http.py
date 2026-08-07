@@ -13,10 +13,11 @@ from typing import Any
 
 from specialized_harness.providers.base import AgentProposal, FileMutation
 from specialized_harness.providers.context import build_propose_body
+from specialized_harness.providers.tokens import normalize_token_usage
 
 
 class HttpAgentProvider:
-    """POST JSON propose body → {mutations, plan_summary}."""
+    """POST JSON propose body → {mutations, plan_summary, optional token_usage}."""
 
     def __init__(
         self,
@@ -29,7 +30,7 @@ class HttpAgentProvider:
             raise ValueError("HttpAgentProvider requires a non-empty endpoint URL")
         self.endpoint = endpoint
         self.timeout_s = timeout_s
-        self._opener = opener  # injectable for tests
+        self._opener = opener
 
     def propose(self, node_id: str, context: dict[str, Any]) -> AgentProposal:
         body = build_propose_body(node_id, context)
@@ -66,10 +67,14 @@ class HttpAgentProvider:
             mutations.append(
                 FileMutation(path=str(m["path"]), content=m.get("content"))
             )
+        meta = {"provider": "HttpAgentProvider", "endpoint": self.endpoint}
+        tokens = normalize_token_usage(payload.get("token_usage"))
+        if tokens:
+            meta["token_usage"] = tokens
         return AgentProposal(
             mutations=mutations,
             plan_summary=str(payload.get("plan_summary") or ""),
-            metadata={"provider": "HttpAgentProvider", "endpoint": self.endpoint},
+            metadata=meta,
         )
 
 
