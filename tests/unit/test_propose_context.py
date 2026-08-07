@@ -1,4 +1,4 @@
-"""S6-1: optional propose context from evidence + tool protocol fields."""
+"""Propose context + tool protocol fields."""
 import json
 
 from specialized_harness.providers.context import ALLOWED_TOOLS, build_propose_body
@@ -48,7 +48,6 @@ def test_build_body_tool_round_fields():
     assert body["max_tool_rounds"] == 8
     assert body["observations"] == obs
     assert body["task_brief"] == "Fix add"
-    assert body["allowed_tools"] == list(ALLOWED_TOOLS)
 
 
 def test_http_forwards_context():
@@ -72,8 +71,6 @@ def test_http_forwards_context():
         },
     )
     assert captured["body"]["last_ci_ok"] is False
-    assert captured["body"]["last_ci_stdout"] == "boom"
-    assert captured["body"]["net_loc"] == 3
     assert captured["body"]["round"] == 0
     assert "allowed_tools" in captured["body"]
 

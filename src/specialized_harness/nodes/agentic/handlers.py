@@ -71,7 +71,6 @@ def build_agentic_handlers() -> dict[str, Handler]:
         if inspect is not None:
             meta["tools_called"] = inspect.tools_called()
             meta["tool_observations"] = inspect.observations()
-        # Provider-level multi-round accounting (HTTP tool protocol)
         prov_tools = proposal.metadata.get("tools_called") or []
         if prov_tools and not meta.get("tools_called"):
             meta["tools_called"] = list(prov_tools)
