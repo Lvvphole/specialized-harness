@@ -1,1 +1,1 @@
-fixture: always_fail_ci — CI always fails
+fixture: always_fail_ci - CI always fails
