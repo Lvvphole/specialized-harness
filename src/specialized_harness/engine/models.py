@@ -77,6 +77,7 @@ class TrajectoryEvent:
     artifacts: list[str]
     error: str | None
     metadata: dict[str, Any]
+    duration_ms: int = 0
 
     def canonical_hash(self) -> str:
         payload = json.dumps(self.__dict__, sort_keys=True, default=str)
@@ -89,3 +90,4 @@ class RunResult:
     final_status: FinalStatus
     trajectory: list[TrajectoryEvent]
     error: str | None = None
+    total_ms: int = 0
