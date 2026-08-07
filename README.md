@@ -58,16 +58,79 @@ These documents are the source of truth. Runtime code must enforce them.
 4. Did the requested outcome actually occur?
 5. Who gets to declare success?
 
-## Quick Start (Conceptual)
+## Install
 
 ```bash
-pip install -e .
+git clone https://github.com/Lvvphole/specialized-harness.git
+cd specialized-harness
+pip install -e ".[dev]"
+pytest -q   # expect green (currently 51 tests)
+```
 
+## Quick Start (fixture demos)
+
+The runtime CLI runs the `standard-coding` blueprint against **fixture** tasks. The default provider is `ScriptedProvider` (no live model required). Acceptance is decided only by the ledger + CI evidence, never by the model.
+
+### ACCEPT path (`fix_add`)
+
+Product code starts **broken**; the scripted implementer repairs `app.py` in a disposable workspace; pytest in the workspace must pass.
+
+```bash
 specialized-harness run \
-  --blueprint standard-coding \
-  --repo /path/to/monorepo \
-  --task "Fix the flaky test in payments/invoice_test.rb" \
-  --model <provider/model>
+  --blueprint blueprints/standard-coding.yaml \
+  --fixture-root fixtures \
+  --task fix_add \
+  --json
+```
+
+Expected: `final_status=ACCEPT`. Run artifacts: `artifacts/runs/<run_id>/run.json` (trajectory, claims, `total_ms`).
+
+### HUMAN_HANDOFF path (`always_fail_ci`)
+
+```bash
+specialized-harness run \
+  --blueprint blueprints/standard-coding.yaml \
+  --fixture-root fixtures \
+  --task always_fail_ci \
+  --json
+```
+
+Expected: `final_status=HUMAN_HANDOFF` after two real CI failures (max two CI rounds; no third).
+
+### LOC budget rejection (`over_loc`)
+
+```bash
+specialized-harness run \
+  --blueprint blueprints/standard-coding.yaml \
+  --fixture-root fixtures \
+  --task over_loc \
+  --json
+```
+
+Expected: not `ACCEPT` when measured net LOC exceeds `max_net_loc` (1000).
+
+## Sprint history
+
+| Sprint | Theme | Status | Review / backlog |
+|--------|--------|--------|------------------|
+| **1** | Control plane (engine, policy, ACCEPT/HANDOFF) | Closed | [SPRINT1_REVIEW.md](docs/SPRINT1_REVIEW.md) |
+| **2** | Real sandbox, verify, LOC, ledger, provider | Closed | [SPRINT2_REVIEW.md](docs/SPRINT2_REVIEW.md) |
+| **3** | Product-code fix, honest git, persistence | Musts closed | [SPRINT3_REVIEW.md](docs/SPRINT3_REVIEW.md) · [SPRINT3_BACKLOG.md](docs/SPRINT3_BACKLOG.md) |
+| **4** | Latency metrics, registry modularization, docs | In progress | [SPRINT4_BACKLOG.md](docs/SPRINT4_BACKLOG.md) |
+
+## Repository layout (runtime)
+
+```text
+src/specialized_harness/
+  engine/           # BlueprintEngine state machine, models
+  nodes/            # deterministic + agentic handlers, registry
+  providers/        # AgentProvider protocol, ScriptedProvider
+  sandboxes/        # disposable workspace isolation
+  observability/    # EvidenceLedger, run persistence
+  policy/           # CI/LOC/trajectory enforcer
+blueprints/         # standard-coding.yaml
+fixtures/           # fix_add, always_fail_ci, over_loc
+docs/               # sprint reviews and backlogs
 ```
 
 ## License
