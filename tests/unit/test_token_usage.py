@@ -1,14 +1,15 @@
 """S6-2: token_usage from provider → trajectory; metrics when present."""
 import json
 from pathlib import Path
-from specialized_harness.providers.tokens import normalize_token_usage
-from specialized_harness.providers.http import HttpAgentProvider
-from specialized_harness.engine.models import FinalStatus
-from specialized_harness.engine.loader import load_blueprint
+
 from specialized_harness.engine.blueprint_engine import BlueprintEngine
+from specialized_harness.engine.loader import load_blueprint
+from specialized_harness.engine.models import FinalStatus
 from specialized_harness.nodes.registry import make_fixture_handlers
 from specialized_harness.observability.ledger import EvidenceLedger
 from specialized_harness.observability.metrics import summarize_runs_dir
+from specialized_harness.providers.http import HttpAgentProvider
+from specialized_harness.providers.tokens import normalize_token_usage
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
 
 ROOT = Path(__file__).resolve().parents[2]
