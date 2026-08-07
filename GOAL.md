@@ -26,6 +26,10 @@ At this point the harness is no longer merely a coding-agent wrapper. It is a **
 **Not a better agent.  
 A scientifically governed system for discovering better ways to solve problems.**
 
+### Who optimizes under this goal
+
+The harness serves **engineers/operators** and **vibe coders** alike: people who want reliable, clean, verified outcomes from model-assisted coding without making the model the authority. Workflow search and Cost per Verified Correct Outcome exist so both can get sufficient correctness at minimum sufficient cost — not so a chat UI can declare success.
+
 ---
 
 ## 2. The Harness Searches a Workflow Space
@@ -353,7 +357,7 @@ with mandatory correctness and safety constraints outside the tradeable denomina
                           │
                           └───────────────┐
                                           │
-                         next problem ◄───┘
+                         next problem ◀───┘
 ```
 
 This is a **closed-loop engineering system for workflow discovery**, not merely an agent loop.
