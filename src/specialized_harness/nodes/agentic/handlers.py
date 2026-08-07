@@ -14,8 +14,22 @@ from specialized_harness.providers.base import AgentProvider
 from specialized_harness.providers.scripted import ScriptedProvider
 from specialized_harness.providers.tokens import normalize_token_usage
 from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
+from specialized_harness.tools.repo_inspect import RepoInspect
 
 Handler = Callable[[dict[str, Any]], NodeResult]
+
+
+def ensure_repo_inspect(ctx: dict[str, Any]) -> RepoInspect | None:
+    """Attach read-only RepoInspect bound to the provisioned sandbox."""
+    existing = ctx.get("repo_inspect")
+    if isinstance(existing, RepoInspect):
+        return existing
+    sandbox = ctx.get("sandbox")
+    if sandbox is None or getattr(sandbox, "root", None) is None:
+        return None
+    inspect = RepoInspect(sandbox=sandbox)
+    ctx["repo_inspect"] = inspect
+    return inspect
 
 
 def build_agentic_handlers() -> dict[str, Handler]:
@@ -23,6 +37,7 @@ def build_agentic_handlers() -> dict[str, Handler]:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
         ws = str(sandbox.root) if sandbox and sandbox.root else ""
         provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        ensure_repo_inspect(ctx)
         proposal = provider.propose("plan", ctx)
         meta = {"plan": proposal.plan_summary or "plan", "workspace": ws}
         tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
@@ -35,6 +50,7 @@ def build_agentic_handlers() -> dict[str, Handler]:
         if sandbox is None or sandbox.root is None:
             return fail("Workspace not provisioned before implement")
         provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        inspect = ensure_repo_inspect(ctx)
         proposal = provider.propose("implement", ctx)
         if proposal.error:
             return fail(proposal.error)
@@ -46,12 +62,15 @@ def build_agentic_handlers() -> dict[str, Handler]:
         ctx["policy"].net_loc = net
         evidence = ctx.setdefault("evidence", {})
         evidence["net_loc"] = net
-        meta = {
+        meta: dict[str, Any] = {
             "files_changed": files_changed,
             "net_loc": net,
             "workspace": str(sandbox.root),
             "provider": type(provider).__name__,
         }
+        if inspect is not None:
+            meta["tools_called"] = inspect.tools_called()
+            meta["tool_observations"] = inspect.observations()
         tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
         if tokens:
             meta["token_usage"] = tokens
@@ -81,6 +100,7 @@ def build_agentic_handlers() -> dict[str, Handler]:
 
     def fix_ci_failures(ctx: dict[str, Any]) -> NodeResult:
         provider: AgentProvider = ctx.get("provider") or ScriptedProvider()
+        ensure_repo_inspect(ctx)
         proposal = provider.propose("fix_ci_failures", ctx)
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
         files_changed: list[str] = []
@@ -89,11 +109,14 @@ def build_agentic_handlers() -> dict[str, Handler]:
                 files_changed = apply_proposal(sandbox, proposal)
             except WorkspaceError as e:
                 return fail(str(e))
-        fix_meta = {
+        fix_meta: dict[str, Any] = {
             "attempted_fix": True,
             "files_changed": files_changed,
             "plan": proposal.plan_summary,
         }
+        inspect = ctx.get("repo_inspect")
+        if isinstance(inspect, RepoInspect):
+            fix_meta["tools_called"] = inspect.tools_called()
         tokens = normalize_token_usage(proposal.metadata.get("token_usage"))
         if tokens:
             fix_meta["token_usage"] = tokens

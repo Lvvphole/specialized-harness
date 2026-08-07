@@ -47,6 +47,13 @@ class ScriptedProvider:
                 )
             ]
             if _wants_fix_add(context):
+                inspect = context.get("repo_inspect")
+                if inspect is not None:
+                    try:
+                        inspect.read_file("app.py")
+                        inspect.search_code("def add")
+                    except Exception:
+                        pass
                 mutations.append(FileMutation(path="app.py", content=_FIX_ADD_APP))
             if task == "over_loc":
                 mutations.append(
