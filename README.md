@@ -75,7 +75,7 @@ pip install -e ".[dev]"
 pytest -q
 ```
 
-Expected: `63 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
+Expected: `67 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
 
 ---
 
@@ -228,7 +228,7 @@ class AgentProvider(Protocol):
 | Provider | Selected when | Notes |
 |----------|---------------|-------|
 | `ScriptedProvider` | default | Deterministic, offline; used by all fixtures and tests |
-| `HttpAgentProvider` | `HARNESS_PROVIDER_URL` is set | `POST` JSON `{node_id, task, run_id}` → `{mutations, plan_summary}` |
+| `HttpAgentProvider` | `HARNESS_PROVIDER_URL` is set | `POST` JSON propose body → `{mutations, plan_summary, token_usage?}` |
 
 ```bash
 export HARNESS_PROVIDER_URL="https://your-endpoint/propose"
@@ -279,7 +279,7 @@ src/specialized_harness/
 blueprints/           # standard-coding.yaml
 configs/              # example monorepo overlay (selective CI, linters, tool scopes)
 fixtures/             # fix_add · always_fail_ci · over_loc
-tests/                # 14 unit + 12 integration modules
+tests/                # unit + integration modules
 docs/                 # sprint reviews, backlogs, writing style
 ```
 
@@ -288,7 +288,7 @@ docs/                 # sprint reviews, backlogs, writing style
 ## Development
 
 ```bash
-pytest -q                      # full suite (63 tests)
+pytest -q                      # full suite (67 tests)
 pytest tests/unit -q           # deterministic units only
 pytest tests/integration -q    # real sandbox + real pytest execution
 ruff check src tests           # lint, as run in CI
@@ -314,13 +314,13 @@ Contributions are governed by the authority documents, not by preference. Before
 | **3** | Product-code fix, honest git, persistence | Musts closed | [Review](docs/SPRINT3_REVIEW.md) · [Backlog](docs/SPRINT3_BACKLOG.md) |
 | **4** | Latency metrics, registry modularization, docs | Closed | [Review](docs/SPRINT4_REVIEW.md) · [Backlog](docs/SPRINT4_BACKLOG.md) |
 | **5** | Offline metrics + HTTP provider boundary | Closed | [Review](docs/SPRINT5_REVIEW.md) · [Backlog](docs/SPRINT5_BACKLOG.md) |
-| **6** | Provider context, token accounting, LOC prune | S6-1 landed | [Backlog](docs/SPRINT6_BACKLOG.md) |
+| **6** | Provider context, token accounting, LOC prune | Closed | [SPRINT6_REVIEW.md](docs/SPRINT6_REVIEW.md) · [SPRINT6_BACKLOG.md](docs/SPRINT6_BACKLOG.md) |
 
 ---
 
 ## Status and non-goals
 
-Implemented and test-covered today: the blueprint engine, deterministic gates, the disposable workspace, real `pytest` execution as CI evidence, the evidence ledger, run persistence, offline metrics, and the two providers.
+Implemented and test-covered today: the blueprint engine, deterministic gates, the disposable workspace, real `pytest` execution as CI evidence, the evidence ledger, run persistence, offline metrics, provider context enrichment, optional token accounting, and the two providers.
 
 Not yet implemented — described in the authority documents as design intent, not as shipped behavior:
 
