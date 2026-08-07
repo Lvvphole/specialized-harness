@@ -10,7 +10,9 @@
 
 ## Ordered candidates
 
-### S7-1 — Sprint/docs alignment (docs-only, preferred first)
+### S7-1 — Sprint/docs alignment (docs-only) — **COMPLETE 2026-08-07**
+
+See [STATUS.md](STATUS.md).
 
 **Story**: README test count + sprint history fully consistent; optional STATUS.md summarizing Done vs deferred (multi-model, Pareto, maintenance).
 
@@ -46,7 +48,7 @@
 
 | Must | Stretch |
 |------|---------|
-| S7-1 docs/Done boundary | S7-2 if owner wants PR-only `main` |
+| S7-1 docs/Done boundary **done** | S7-2 if owner wants PR-only `main` |
 
 ## Draft exit criteria
 
