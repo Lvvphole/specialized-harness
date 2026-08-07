@@ -4,8 +4,9 @@ Public API unchanged: make_fixture_handlers(fixture_root, task) -> handler map.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from specialized_harness.engine.models import NodeResult
 from specialized_harness.nodes.agentic.handlers import build_agentic_handlers

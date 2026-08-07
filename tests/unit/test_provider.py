@@ -1,8 +1,9 @@
 """AgentProvider interface tests."""
 from pathlib import Path
-from specialized_harness.providers.scripted import ScriptedProvider
-from specialized_harness.providers.base import AgentProposal, AgentProvider, FileMutation
+
 from specialized_harness.nodes.agentic.apply import apply_proposal
+from specialized_harness.providers.base import AgentProposal, AgentProvider, FileMutation
+from specialized_harness.providers.scripted import ScriptedProvider
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
 
 

@@ -1,5 +1,6 @@
 """Integration: runs must not mutate source fixtures (AGENTS.md isolation)."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
 from specialized_harness.sandboxes.workspace import fingerprint_tree

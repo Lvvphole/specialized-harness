@@ -1,7 +1,8 @@
 """Agentic node handlers (plan / implement / fix) - propose via AgentProvider."""
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from specialized_harness.engine.models import NodeResult
 from specialized_harness.nodes.agentic.apply import apply_proposal

@@ -1,5 +1,6 @@
 """Integration: ACCEPT path against fix_add fixture."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus, NodeType
 from specialized_harness.runner import run_fixture_task
 

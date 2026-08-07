@@ -1,5 +1,6 @@
 """S5-1: metrics CLI over real fixture runs."""
 from pathlib import Path
+
 from specialized_harness.cli import main
 from specialized_harness.runner import run_fixture_task
 

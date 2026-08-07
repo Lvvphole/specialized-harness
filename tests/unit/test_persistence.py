@@ -1,5 +1,6 @@
 """Trajectory + ledger persistence unit tests."""
 from pathlib import Path
+
 from specialized_harness.engine.models import (
     ExitStatus,
     FinalStatus,

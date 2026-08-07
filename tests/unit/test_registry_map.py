@@ -1,5 +1,6 @@
 """S4-2: public handler map keys stable after modularization."""
 from pathlib import Path
+
 from specialized_harness.nodes.registry import make_fixture_handlers
 
 REQUIRED = {

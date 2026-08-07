@@ -1,5 +1,6 @@
 """S3-3: full runs write artifacts/runs/{run_id}/run.json."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.observability.persistence import load_run
 from specialized_harness.runner import run_fixture_task

@@ -1,5 +1,6 @@
 """Integration: max_net_loc enforced from measured workspace diffs."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
 
