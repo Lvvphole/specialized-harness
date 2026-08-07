@@ -1,4 +1,5 @@
 # Compatibility umbrella — unit + integration + offline evals.
+# Prefer split workflows for signal clarity. AGENTS.md §8: CI never merges.
 name: Specialized Harness CI
 
 on:
@@ -8,7 +9,7 @@ on:
     branches: [main]
 
 jobs:
-  unit-lint:
+  unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

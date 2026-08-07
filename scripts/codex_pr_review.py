@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Advisory Codex/OpenAI PR review for specialized-harness.
 
-Writes /tmp/codex-review.md. Never declares merge authority.
-Respects AGENTS.md: model is not authority; human merges only.
+Writes /tmp/codex-review.md. Never declares merge authority (AGENTS.md §8).
 """
 from __future__ import annotations
 
@@ -16,14 +15,14 @@ SYSTEM = """You are an advisory code reviewer for specialized-harness, an author
 coding-agent harness (AGENTS.md). The coding model is NOT the authority.
 
 Focus on:
-1. Does the change weaken independent ACCEPT (ledger/CI/decide)?
-2. Path escape / sandbox isolation regressions?
-3. Provider writing success claims or applying mutations outside harness?
+1. Independent ACCEPT (ledger/CI/decide) weakened?
+2. Sandbox isolation / path-escape regressions?
+3. Provider applying mutations or declaring success outside harness?
 4. Missing tests for new behavior?
 5. Scope creep vs Minimum Sufficient Harness?
 
 Be concise. Bullet findings. Say "No blocking concerns" if none.
-You do NOT approve merges. End with: "Human review required before merge (AGENTS.md \u00a78)."
+You do NOT approve merges. End with: "Human review required before merge (AGENTS.md §8)."
 """
 
 
@@ -36,8 +35,8 @@ def main() -> int:
     )
     if not diff.strip():
         OUT.write_text(
-            "## Codex advisory review\n\n_Empty diff \u2014 nothing to review._\n\n"
-            "Human review required before merge (AGENTS.md \u00a78).\n",
+            "## Codex advisory review\n\n_Empty diff — nothing to review._\n\n"
+            "Human review required before merge (AGENTS.md §8).\n",
             encoding="utf-8",
         )
         return 0
@@ -57,7 +56,7 @@ def main() -> int:
         from openai import OpenAI
 
         client = OpenAI(api_key=key)
-        model = os.environ.get("CODEX_REVIEW_MODEL", "gpt-4.1-mini")
+        model = os.environ.get("CODEX_REVIEW_MODEL") or "gpt-4.1-mini"
         user = (
             f"PR title: {title}\n\nPR body (truncated):\n{body}\n\n"
             f"Diff (bounded):\n```\n{diff}\n```\n"
@@ -78,9 +77,9 @@ def main() -> int:
     OUT.write_text(
         "## Codex advisory review\n\n"
         "> Advisory only. **Not** merge authority. "
-        "CI unit/integration/evals remain the gates.\n\n"
+        "Unit / integration / evals remain the gates.\n\n"
         f"{text}\n\n"
-        "---\nHuman review required before merge (AGENTS.md \u00a78).\n",
+        "---\nHuman review required before merge (AGENTS.md §8).\n",
         encoding="utf-8",
     )
     return 0
