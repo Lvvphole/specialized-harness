@@ -11,7 +11,7 @@ from specialized_harness.engine.models import RunResult
 from specialized_harness.nodes.registry import make_fixture_handlers
 from specialized_harness.observability.ledger import EvidenceLedger
 from specialized_harness.observability.persistence import persist_run
-from specialized_harness.providers.scripted import ScriptedProvider
+from specialized_harness.providers.http import provider_from_env
 from specialized_harness.sandboxes.workspace import WorkspaceSandbox
 
 
@@ -37,7 +37,7 @@ def run_fixture_task(
         "fixture_source": source.resolve(),
         "evidence": {},  # mutable bag shared across nodes (CI outcomes, etc.)
         "ledger": EvidenceLedger(),
-        "provider": ScriptedProvider(),
+        "provider": provider_from_env(),
     }
     try:
         engine = BlueprintEngine(bp, handlers, run_id=rid, context=context)
