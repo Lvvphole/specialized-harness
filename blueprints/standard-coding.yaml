@@ -2,156 +2,83 @@ apiVersion: specialized-harness/v1
 kind: Blueprint
 metadata:
   name: standard-coding
-  description: >
-    Governed implementation of a coding task under explicit authority,
-    constrained scope, independent verification, and independent
-    declaration of success.
+  description: Governed implementation under explicit authority
   version: "1.1.0"
-  labels:
-    tier: production
-    domain: coding
-
 spec:
   policy:
     max_ci_rounds: 2
     max_agentic_recovery_attempts: 1
     max_net_loc: 1000
-    default_agentic_timeout: 15m
     require_trajectory: true
     require_authority_resolution: true
-
   nodes:
     - id: resolve_authority
       type: deterministic
       handler: resolve_authority
-      description: Establish task contract, applicable specs, tests, and policies
-
     - id: constrain_scope
       type: deterministic
       handler: constrain_scope
-      description: Bind permitted files, tools, and side effects
-
     - id: provision
       type: deterministic
       handler: provision_sandbox
-      description: Create and warm an isolated execution environment
-
     - id: plan
       type: agentic
       handler: plan
-      description: Propose an implementation approach within authorized scope
-      tools:
-        - read_file
-        - list_dir
-        - search_code
-        - get_ticket
-        - get_file_tree
-      system_prompt_ref: prompts/plan.md
-      budget:
-        max_tokens: 32000
-        timeout: 10m
-
     - id: implement
       type: agentic
       handler: implement
-      description: Propose code changes within authorized scope and LOC budget
-      tools:
-        - read_file
-        - write_file
-        - list_dir
-        - search_code
-        - run_local_command
-      system_prompt_ref: prompts/implement.md
-      budget:
-        max_tokens: 64000
-        timeout: 20m
-
     - id: local_verify
       type: deterministic
       handler: run_local_verification
-      description: Lint, type-check, contract validation; apply available autofixes
-
     - id: push
       type: deterministic
       handler: git_push
-      description: Create branch and push changes (only after local verification)
-
     - id: ci_round
       type: deterministic
       handler: selective_ci_and_verify_outcome
-      description: Selective CI plus independent outcome verification
-
     - id: fix_ci
       type: agentic
       handler: fix_ci_failures
-      description: Address remaining CI failures after autofix (within recovery budget)
-      tools:
-        - read_file
-        - write_file
-        - run_local_command
-        - get_test_output
-        - search_code
-      system_prompt_ref: prompts/fix_ci.md
-      budget:
-        max_tokens: 48000
-        timeout: 15m
-
     - id: decide
       type: deterministic
       handler: decide_accept_or_handoff
-      description: Independent declaration of success or explicit human handoff
-
   edges:
     - from: resolve_authority
       to: constrain_scope
-      on: success
-
+      "on": success
     - from: constrain_scope
       to: provision
-      on: success
-
+      "on": success
     - from: provision
       to: plan
-      on: success
-
+      "on": success
     - from: plan
       to: implement
-      on: success
-
+      "on": success
     - from: implement
       to: local_verify
-      on: success
-
+      "on": success
     - from: local_verify
       to: push
-      on: success
-
+      "on": success
     - from: local_verify
       to: implement
-      on: failure
+      "on": failure
       when: recovery_attempts < max_agentic_recovery_attempts
-
     - from: push
       to: ci_round
-      on: success
-
+      "on": success
     - from: ci_round
       to: decide
-      on: success
-
+      "on": success
     - from: ci_round
       to: fix_ci
-      on: failure
+      "on": failure
       when: ci_rounds < max_ci_rounds
-
     - from: ci_round
       to: decide
-      on: failure
+      "on": failure
       when: ci_rounds >= max_ci_rounds
-
     - from: fix_ci
       to: push
-      on: success
-
-  # Safety: the engine statically verifies that no path can exceed max_ci_rounds
-  # and that authority resolution and independent decision are present on accepting paths.
+      "on": success
