@@ -75,7 +75,7 @@ pip install -e ".[dev]"
 pytest -q
 ```
 
-Expected: `59 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
+Expected: `63 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
 
 ---
 
@@ -271,14 +271,15 @@ src/specialized_harness/
     deterministic/    # authority, checks, git_ops, loc, decide
     agentic/          # plan / implement / fix_ci, proposal application
     registry.py       # handler composition
-  providers/          # AgentProvider protocol, ScriptedProvider, HttpAgentProvider
+  providers/          # AgentProvider protocol, ScriptedProvider, HttpAgentProvider,
+                      #   optional proposal-request context
   sandboxes/          # disposable workspace isolation + source fingerprinting
   observability/      # EvidenceLedger, run persistence, offline metrics
   policy/             # CI / LOC / trajectory enforcement
 blueprints/           # standard-coding.yaml
 configs/              # example monorepo overlay (selective CI, linters, tool scopes)
 fixtures/             # fix_add · always_fail_ci · over_loc
-tests/                # 13 unit + 12 integration modules
+tests/                # 14 unit + 12 integration modules
 docs/                 # sprint reviews, backlogs, writing style
 ```
 
@@ -287,13 +288,13 @@ docs/                 # sprint reviews, backlogs, writing style
 ## Development
 
 ```bash
-pytest -q                      # full suite (59 tests)
+pytest -q                      # full suite (63 tests)
 pytest tests/unit -q           # deterministic units only
 pytest tests/integration -q    # real sandbox + real pytest execution
 ruff check src tests           # lint, as run in CI
 ```
 
-CI runs the suite and `ruff check` on every push and pull request to `main` (`.github/workflows/ci.yml`).
+CI runs the suite and `ruff check` on every push and pull request to `main` (`.github/workflows/ci.yml`). ruff is pinned in the `dev` extra and its rule set is declared in `[tool.ruff.lint]`, so the gate does not change when a new ruff is released.
 
 Contributions are governed by the authority documents, not by preference. Before proposing a change:
 
@@ -313,7 +314,7 @@ Contributions are governed by the authority documents, not by preference. Before
 | **3** | Product-code fix, honest git, persistence | Musts closed | [Review](docs/SPRINT3_REVIEW.md) · [Backlog](docs/SPRINT3_BACKLOG.md) |
 | **4** | Latency metrics, registry modularization, docs | Closed | [Review](docs/SPRINT4_REVIEW.md) · [Backlog](docs/SPRINT4_BACKLOG.md) |
 | **5** | Offline metrics + HTTP provider boundary | Closed | [Review](docs/SPRINT5_REVIEW.md) · [Backlog](docs/SPRINT5_BACKLOG.md) |
-| **6** | Provider context, token accounting, LOC prune | Planned | [Backlog](docs/SPRINT6_BACKLOG.md) |
+| **6** | Provider context, token accounting, LOC prune | S6-1 landed | [Backlog](docs/SPRINT6_BACKLOG.md) |
 
 ---
 
