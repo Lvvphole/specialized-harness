@@ -1,7 +1,7 @@
 # AGENTS.md — Authority Document for the Specialized Agentic Harness
 
 **Status**: Production Authority  
-**Version**: 1.1.0  
+**Version**: 1.2.0  
 **Last Updated**: 2026-08-07  
 **Scope**: Authoritative coding-agent harness — deterministic governance of probabilistic generation
 
@@ -160,6 +160,7 @@ Every additional control, node, tool, or policy layer must demonstrably improve 
 - Continue working after the second CI round or after a hard policy limit has been reached.
 - Emit unstructured or incomplete trajectory data.
 - Treat any model-generated statement as authoritative over a deterministic result.
+- **Commit, push, or merge to this repository’s `main` branch** (see §8).
 
 ### 3.3 Failure Handling
 - Recoverable deterministic failures are routed to a designated recovery path or to human handoff according to the blueprint.
@@ -211,12 +212,35 @@ Conflicts are resolved by the higher document. Runtime code must refuse to start
 
 ---
 
-## 8. Change Control
+## 8. Repository Write Authority (`main`)
+
+This section governs **this harness repository** (`Lvvphole/specialized-harness`), not the sandboxed coding runs the harness executes.
+
+| Subject | Authority on `main` |
+|---------|---------------------|
+| **Human reviewer / repository owner** | Sole authority to **merge** to `main` and to **write** directly to `main` when GitHub settings permit an emergency path |
+| **Large language models (LLMs), coding agents, automated bots** | **No** authority to commit, push, or merge to `main`. They may only open **pull requests** from feature branches |
+| **CI systems** | May report status on PRs; may not bypass human merge authority |
+
+**Rules**
+
+1. All changes proposed by an LLM or agent **must** land via a **pull request** targeting `main`.
+2. The PR description must state what changed and that **only a human** may merge.
+3. Direct pushes to `main` by models or agents are a **policy violation** of this authority document.
+4. GitHub branch protection should enforce: require PR before merge; require human review; restrict who can push to `main`.
+5. This rule does not transfer product-code ACCEPT authority to a model; it separates **repo governance** from **run acceptance**.
+
+Human reviewer of record for merges: repository owner **@Lvvphole** (or a human they designate in writing on the PR).
+
+---
+
+## 9. Change Control
 
 Changes to this document require:
 - Explicit update of the version number
 - Review against the regression suite of blueprints
 - Confirmation that no core invariant (especially the five questions and independent declaration of success) has been weakened
 - Consistency with GOAL.md
+- A **pull request** reviewed and merged by a **human** (see §8)
 
 This document is the contract between the harness authors and any downstream consumer.
