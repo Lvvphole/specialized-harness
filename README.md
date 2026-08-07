@@ -116,7 +116,7 @@ Expected: not `ACCEPT` when measured net LOC exceeds `max_net_loc` (1000).
 | **1** | Control plane (engine, policy, ACCEPT/HANDOFF) | Closed | [SPRINT1_REVIEW.md](docs/SPRINT1_REVIEW.md) |
 | **2** | Real sandbox, verify, LOC, ledger, provider | Closed | [SPRINT2_REVIEW.md](docs/SPRINT2_REVIEW.md) |
 | **3** | Product-code fix, honest git, persistence | Musts closed | [SPRINT3_REVIEW.md](docs/SPRINT3_REVIEW.md) · [SPRINT3_BACKLOG.md](docs/SPRINT3_BACKLOG.md) |
-| **4** | Latency metrics, registry modularization, docs | In progress | [SPRINT4_BACKLOG.md](docs/SPRINT4_BACKLOG.md) |
+| **4** | Latency metrics, registry modularization, docs | Closed | [SPRINT4_REVIEW.md](docs/SPRINT4_REVIEW.md) · [SPRINT4_BACKLOG.md](docs/SPRINT4_BACKLOG.md) |
 
 ## Repository layout (runtime)
 
