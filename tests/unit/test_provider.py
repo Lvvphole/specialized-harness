@@ -11,6 +11,8 @@ def test_scripted_implement_proposal():
     prop = p.propose("implement", {"task": "fix_add", "run_id": "r1"})
     assert isinstance(prop, AgentProposal)
     assert any(m.path == "harness_impl_marker.txt" for m in prop.mutations)
+    assert any(m.path == "app.py" for m in prop.mutations)
+    assert "a + b" in next(m.content for m in prop.mutations if m.path == "app.py")
 
 
 def test_scripted_over_loc_bulk():

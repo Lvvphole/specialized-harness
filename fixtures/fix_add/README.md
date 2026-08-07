@@ -1,1 +1,1 @@
-fixture: fix_add - tests pass after implement
+fixture: fix_add — broken add(); ScriptedProvider must repair product code for ACCEPT

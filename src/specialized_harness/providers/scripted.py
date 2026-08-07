@@ -5,6 +5,11 @@ from typing import Any
 
 from specialized_harness.providers.base import AgentProposal, FileMutation
 
+_FIX_ADD_APP = '''def add(a, b):
+    """Return the sum of a and b."""
+    return a + b
+'''
+
 
 class ScriptedProvider:
     """Minimum-sufficient provider: task-keyed file mutations for proofs."""
@@ -17,12 +22,14 @@ class ScriptedProvider:
             return AgentProposal(plan_summary=f"scripted plan for {task}")
 
         if node_id in ("implement",):
-            mutations = [
+            mutations: list[FileMutation] = [
                 FileMutation(
                     path="harness_impl_marker.txt",
                     content=f"implemented-by:{run_id}\n",
                 )
             ]
+            if task == "fix_add":
+                mutations.append(FileMutation(path="app.py", content=_FIX_ADD_APP))
             if task == "over_loc":
                 mutations.append(
                     FileMutation(
