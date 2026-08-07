@@ -1,7 +1,7 @@
 # SECURITY.md — Isolation, Permissions & Threat Model
 
 **Status**: Production Authority  
-**Version**: 1.0.0
+**Version**: 1.1.0
 
 ---
 
@@ -14,6 +14,7 @@ The primary risks this harness is designed to contain:
 - Runaway cost or resource consumption.
 - Poisoning of the trajectory or audit trail.
 - Accidental or intentional modification of the harness itself during a run.
+- An LLM or agent writing directly to `main`, bypassing human review of authority documents or runtime gates.
 
 ---
 
@@ -34,6 +35,8 @@ The primary risks this harness is designed to contain:
 | Agent outside sandbox | None |
 | Deterministic nodes | Only the side effects required by their contract (git, lint, CI submission) |
 | Blueprint / policy files | Read-only to the agent; writable only by the harness control plane |
+| LLM / coding agent on this repo | May open pull requests from feature branches only; **no** write or merge to `main` |
+| Human reviewer / owner | Sole authority to merge to `main` |
 
 ---
 
@@ -58,3 +61,22 @@ The primary risks this harness is designed to contain:
 - Sandbox images are built from a controlled base and scanned.
 - Policy Enforcer is the final runtime authority; it cannot be disabled by configuration that the agent can influence.
 - Secrets required for CI or PR creation are injected only into deterministic nodes that need them, never into the agent context.
+
+---
+
+## 7. Repository `main`-branch write model
+
+Threat: an LLM or agent **bypasses human review** by writing directly to `main`, poisoning authority documents, policy, or runtime gates.
+
+| Subject | Write to `main` | Open PR | Merge PR |
+|---------|-----------------|---------|----------|
+| Human reviewer / owner | Only if emergency path is explicitly allowed by owner | Yes | **Yes (sole merge authority)** |
+| LLM / coding agent / bot | **Forbidden** | Yes (feature branch only) | **Forbidden** |
+| CI | No (status checks only) | N/A | **Forbidden** |
+
+Required platform controls (to be enabled by the human owner):
+
+- Branch protection on `main`: require pull request; require at least one human approval; dismiss stale reviews; no force push; restrict who can push.
+- Do not grant models long-lived credentials with `main` push rights.
+
+See AGENTS.md §8 and CONSTRAINTS.md (Repository governance).
