@@ -12,10 +12,11 @@ import urllib.request
 from typing import Any
 
 from specialized_harness.providers.base import AgentProposal, FileMutation
+from specialized_harness.providers.context import build_propose_body
 
 
 class HttpAgentProvider:
-    """POST JSON {node_id, task, run_id} → {mutations, plan_summary}."""
+    """POST JSON propose body → {mutations, plan_summary}."""
 
     def __init__(
         self,
@@ -31,11 +32,7 @@ class HttpAgentProvider:
         self._opener = opener  # injectable for tests
 
     def propose(self, node_id: str, context: dict[str, Any]) -> AgentProposal:
-        body = {
-            "node_id": node_id,
-            "task": context.get("task"),
-            "run_id": context.get("run_id"),
-        }
+        body = build_propose_body(node_id, context)
         data = json.dumps(body).encode("utf-8")
         req = urllib.request.Request(
             self.endpoint,
