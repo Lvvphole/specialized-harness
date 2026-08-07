@@ -203,7 +203,7 @@ class HttpAgentProvider:
                     result: Any = inspect.list_dir(str(args.get("path", ".")))
                 elif name == "read_file":
                     result = inspect.read_file(str(args.get("path", "")))
-                else:  # search_code
+                else:
                     result = inspect.search_code(
                         str(args.get("query", "")),
                         str(args.get("path", ".")),
@@ -257,11 +257,7 @@ def resolve_provider(
     provider_url: str | None = None,
     env: dict[str, str] | None = None,
 ) -> Any:
-    """Select AgentProvider: explicit name/url, else env, else ScriptedProvider.
-
-    Names: scripted | http
-    HARNESS_PROVIDER / HARNESS_PROVIDER_URL still supported for operators.
-    """
+    """Select AgentProvider: explicit name/url, else env, else ScriptedProvider."""
     from specialized_harness.providers.scripted import ScriptedProvider
 
     e = env if env is not None else os.environ
