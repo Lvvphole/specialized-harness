@@ -7,6 +7,7 @@ from typing import Any, Callable
 from specialized_harness.engine.models import ExitStatus, FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic.checks import run_pytest, syntax_check
 from specialized_harness.nodes.deterministic.loc import measure_net_loc
+from specialized_harness.observability.ledger import EvidenceLedger, Verdict
 from specialized_harness.policy.enforcer import PolicyEnforcer, PolicyViolation
 from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox
 
@@ -74,10 +75,27 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
             "net_loc": net,
             "workspace": str(sandbox.root),
         }
+        ledger: EvidenceLedger | None = ctx.get("ledger")
         try:
             PolicyEnforcer(ctx["policy"]).check_loc_allowed(net)
+            if ledger is not None:
+                ledger.append(
+                    claim_id="loc_within_budget",
+                    subject="workspace_diff",
+                    method="measure_net_loc",
+                    observation=f"net_loc={net}",
+                    verdict=Verdict.PASS,
+                )
         except PolicyViolation as e:
             evidence["loc_exceeded"] = True
+            if ledger is not None:
+                ledger.append(
+                    claim_id="loc_within_budget",
+                    subject="workspace_diff",
+                    method="measure_net_loc",
+                    observation=f"net_loc={net}",
+                    verdict=Verdict.FAIL,
+                )
             return _fail(str(e), **meta)
         return _ok(**meta)
 
@@ -86,11 +104,21 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         if sandbox is None or sandbox.root is None:
             return _fail("Workspace not provisioned before local_verify")
         result = syntax_check(sandbox.root)
+        ledger: EvidenceLedger | None = ctx.get("ledger")
+        if ledger is not None:
+            ledger.append(
+                claim_id="syntax_clean",
+                subject="workspace_python",
+                method="py_compile",
+                observation=result.stdout[:500],
+                verdict=Verdict.PASS if result.ok else Verdict.FAIL,
+            )
         meta = {
             "workspace": str(sandbox.root),
             "command": result.command,
             "exit_code": result.exit_code,
             "stdout": result.stdout,
+            "claims": ledger.to_list() if ledger else [],
         }
         if result.ok:
             return _ok(checks=["syntax"], **meta)
@@ -116,6 +144,16 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         }
         evidence = ctx.setdefault("evidence", {})
         evidence["last_ci_ok"] = result.ok
+        ledger: EvidenceLedger | None = ctx.get("ledger")
+        if ledger is not None:
+            ledger.append(
+                claim_id="tests_pass",
+                subject="workspace_pytest",
+                method="pytest",
+                observation=(result.stdout or result.stderr)[:500],
+                verdict=Verdict.PASS if result.ok else Verdict.FAIL,
+            )
+            meta["claims"] = ledger.to_list()
         if result.ok:
             return _ok(tests_passed=True, **meta)
         return _fail("pytest failed in workspace", tests_passed=False, **meta)
@@ -127,26 +165,57 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return _ok(attempted_fix=True)
 
     def decide_accept_or_handoff(ctx: dict[str, Any]) -> NodeResult:
-        """Independent declaration: CI evidence + LOC policy + counters (not the model)."""
+        """Independent declaration from ledger claims + policy counters (not the model)."""
         policy = ctx["policy"]
         evidence = ctx.get("evidence", {})
-        if evidence.get("loc_exceeded"):
+        ledger: EvidenceLedger | None = ctx.get("ledger")
+        claims = ledger.to_list() if ledger else []
+
+        if evidence.get("loc_exceeded") or (
+            ledger
+            and any(
+                c.claim_id == "loc_within_budget" and c.verdict == Verdict.FAIL
+                for c in ledger.claims
+            )
+        ):
             return _ok(
                 final_status=FinalStatus.FAILED.value,
                 reason="net_loc exceeded max_net_loc",
                 net_loc=evidence.get("net_loc"),
+                claims=claims,
             )
+
         last_ok = evidence.get("last_ci_ok")
-        if last_ok is True:
+        if ledger is not None:
+            if last_ok is True and ledger.has_mandatory_pass("tests_pass"):
+                return _ok(
+                    final_status=FinalStatus.ACCEPT.value,
+                    last_ci_ok=True,
+                    net_loc=evidence.get("net_loc"),
+                    claims=claims,
+                )
+            if last_ok is False and policy.ci_rounds >= policy.max_ci_rounds:
+                return _ok(
+                    final_status=FinalStatus.HUMAN_HANDOFF.value,
+                    last_ci_ok=False,
+                    claims=claims,
+                )
+            if last_ok is False:
+                return _ok(
+                    final_status=FinalStatus.FAILED.value,
+                    last_ci_ok=False,
+                    claims=claims,
+                )
             return _ok(
-                final_status=FinalStatus.ACCEPT.value,
-                last_ci_ok=True,
-                net_loc=evidence.get("net_loc"),
+                final_status=FinalStatus.FAILED.value,
+                reason="insufficient evidence",
+                claims=claims,
             )
+
+        if last_ok is True:
+            return _ok(final_status=FinalStatus.ACCEPT.value, last_ci_ok=True)
         if last_ok is False and policy.ci_rounds >= policy.max_ci_rounds:
             return _ok(final_status=FinalStatus.HUMAN_HANDOFF.value, last_ci_ok=False)
-        if last_ok is False:
-            return _ok(final_status=FinalStatus.FAILED.value, last_ci_ok=False)
         return _ok(final_status=FinalStatus.FAILED.value, reason="no CI evidence")
 
     def create_pull_request(ctx: dict[str, Any]) -> NodeResult:
