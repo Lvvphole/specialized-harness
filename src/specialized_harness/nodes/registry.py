@@ -6,6 +6,7 @@ from typing import Any, Callable
 
 from specialized_harness.engine.models import ExitStatus, FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic.checks import run_pytest, syntax_check
+from specialized_harness.nodes.deterministic import git_ops
 from specialized_harness.nodes.deterministic.loc import measure_net_loc
 from specialized_harness.nodes.agentic.apply import apply_proposal
 from specialized_harness.observability.ledger import EvidenceLedger, Verdict
@@ -131,7 +132,44 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return run_local_verification(ctx)
 
     def git_push(ctx: dict[str, Any]) -> NodeResult:
-        return _ok(branch=f"harness/{ctx['run_id'][:8]}")
+        """Local commit + branch only. Remote push is never claimed without a remote."""
+        sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
+        branch = f"harness/{ctx['run_id'][:8]}"
+        if sandbox is None or sandbox.root is None:
+            return _fail("Workspace not provisioned before git_push")
+        ws = sandbox.root
+        init_r = git_ops.ensure_repo(ws)
+        if not init_r.ok:
+            return _fail(
+                f"git init failed: {init_r.stderr}",
+                remote_push=False,
+                remote_push_skipped=True,
+                skip_reason="git_init_failed",
+            )
+        br = git_ops.create_branch(ws, branch)
+        if not br.ok:
+            return _fail(
+                f"git branch failed: {br.stderr}",
+                remote_push=False,
+                remote_push_skipped=True,
+                skip_reason="git_branch_failed",
+            )
+        commit_r = git_ops.commit_all(ws, f"harness run {ctx.get('run_id', '')[:8]}")
+        if not commit_r.ok:
+            return _fail(
+                f"git commit failed: {commit_r.stderr}",
+                remote_push=False,
+                remote_push_skipped=True,
+                skip_reason="git_commit_failed",
+            )
+        return _ok(
+            branch=branch,
+            local_commit=True,
+            remote_push=False,
+            remote_push_skipped=True,
+            skip_reason="no_remote_configured",
+            workspace=str(ws),
+        )
 
     def selective_ci_and_verify_outcome(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
@@ -235,7 +273,18 @@ def make_fixture_handlers(fixture_root: Path, task: str) -> dict[str, Handler]:
         return _ok(final_status=FinalStatus.FAILED.value, reason="no CI evidence")
 
     def create_pull_request(ctx: dict[str, Any]) -> NodeResult:
-        return decide_accept_or_handoff(ctx)
+        """No remote PR in Minimum Sufficient path; record explicit skip then decide."""
+        evidence = ctx.setdefault("evidence", {})
+        evidence["pr_skipped"] = True
+        evidence["pr_skip_reason"] = "no_remote_configured"
+        result = decide_accept_or_handoff(ctx)
+        result.metadata = {
+            **result.metadata,
+            "remote_pr": False,
+            "remote_pr_skipped": True,
+            "skip_reason": "no_remote_configured",
+        }
+        return result
 
     def hydrate_context(ctx: dict[str, Any]) -> NodeResult:
         return _ok()
