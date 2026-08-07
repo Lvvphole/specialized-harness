@@ -1,3 +1,4 @@
+# Compatibility umbrella — unit + integration + offline evals.
 name: Specialized Harness CI
 
 on:
@@ -7,7 +8,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  unit-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,9 +17,31 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: pip install -e ".[dev]"
-      - name: Unit + integration
-        run: pytest -v
+      - name: Unit
+        run: pytest tests/unit -q --tb=line
       - name: Lint
-        # ruff is pinned in the dev extra and installed by the step above;
-        # the rule set comes from [tool.ruff.lint] in pyproject.toml.
         run: ruff check src tests
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Integration
+        run: pytest tests/integration -q --tb=line
+
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Offline eval contracts
+        run: pytest tests/evals -q -m eval --tb=line

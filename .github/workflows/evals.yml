@@ -1,0 +1,30 @@
+# Offline evals — AGENTS.md §4 outcome contracts (ACCEPT / HANDOFF / FAILED).
+# Seed eval corpus; no live model, no network.
+name: Evals
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  offline-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Offline eval contracts
+        run: pytest tests/evals -v -m eval --tb=short
+      - name: CLI smoke (fixture ACCEPT path)
+        run: |
+          specialized-harness run fix_add \
+            --blueprint blueprints/standard-coding.yaml \
+            --fixture-root fixtures \
+            --provider scripted \
+            --runs-dir /tmp/harness-eval-runs

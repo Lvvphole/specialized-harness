@@ -1,0 +1,68 @@
+# Codex bot reviewer — advisory PR review only.
+# Does NOT merge. Does NOT replace human review (AGENTS.md §8).
+# Requires repository secret OPENAI_API_KEY. Skips cleanly if unset.
+name: Codex review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check API key
+        id: key
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "OPENAI_API_KEY not set — skipping Codex review (advisory workflow)."
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.key.outputs.present == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Install review deps
+        if: steps.key.outputs.present == 'true'
+        run: pip install openai httpx
+
+      - name: Diff against base
+        if: steps.key.outputs.present == 'true'
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=50
+          git diff --unified=3 "origin/${{ github.base_ref }}"...HEAD > /tmp/pr.diff
+          head -c 120000 /tmp/pr.diff > /tmp/pr.bounded.diff
+          wc -c /tmp/pr.bounded.diff
+
+      - name: Codex advisory review
+        if: steps.key.outputs.present == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python scripts/codex_pr_review.py /tmp/pr.bounded.diff
+
+      - name: Post review comment
+        if: steps.key.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f /tmp/codex-review.md ]; then
+            gh pr comment "${{ github.event.pull_request.number }}" --body-file /tmp/codex-review.md
+          fi
