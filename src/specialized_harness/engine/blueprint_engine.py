@@ -6,6 +6,7 @@ especially any attempt to exceed max_ci_rounds.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import time
 from typing import Any, Callable
 from uuid import uuid4
 
@@ -68,7 +69,11 @@ class BlueprintEngine:
             if safety > 50:
                 self.final_status = FinalStatus.FAILED
                 return RunResult(
-                    self.run_id, self.final_status, self.trajectory, "safety limit"
+                    self.run_id,
+                    self.final_status,
+                    self.trajectory,
+                    "safety limit",
+                    total_ms=sum(e.duration_ms for e in self.trajectory),
                 )
             node = self.nodes_by_id[self.current_node_id]
             result = self._execute_node(node)
@@ -83,7 +88,12 @@ class BlueprintEngine:
                     self.final_status = FinalStatus.FAILED
                 break
             self.current_node_id = nxt
-        return RunResult(self.run_id, self.final_status, self.trajectory)
+        return RunResult(
+            self.run_id,
+            self.final_status,
+            self.trajectory,
+            total_ms=sum(e.duration_ms for e in self.trajectory),
+        )
 
     def _execute_node(self, node: dict[str, Any]) -> NodeResult:
         node_id = node["id"]
@@ -98,6 +108,7 @@ class BlueprintEngine:
             self.policy.record_ci_round()
 
         started = datetime.now(timezone.utc).isoformat()
+        t0 = time.perf_counter()
         handler = self.handlers.get(handler_name) or self.handlers.get(node_id)
         if handler is None:
             result = NodeResult(
@@ -112,6 +123,7 @@ class BlueprintEngine:
             }
             result = handler(ctx)
         finished = datetime.now(timezone.utc).isoformat()
+        duration_ms = int((time.perf_counter() - t0) * 1000)
 
         self.sequence += 1
         event = TrajectoryEvent(
@@ -129,6 +141,7 @@ class BlueprintEngine:
             artifacts=result.artifacts,
             error=result.error,
             metadata=result.metadata,
+            duration_ms=duration_ms,
         )
         self.trajectory.append(event)
         return result
@@ -151,7 +164,6 @@ class BlueprintEngine:
         on = "success" if result.status == ExitStatus.SUCCESS else "failure"
 
         def edge_on(e: dict) -> str | None:
-            # PyYAML 1.1 may parse bare key `on` as boolean True
             if "on" in e:
                 return e["on"]
             if True in e:
