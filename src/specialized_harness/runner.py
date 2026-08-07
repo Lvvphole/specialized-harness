@@ -30,6 +30,7 @@ def run_fixture_task(
         "task": task,
         "sandbox": sandbox,
         "fixture_source": source.resolve(),
+        "evidence": {},  # mutable bag shared across nodes (CI outcomes, etc.)
     }
     try:
         engine = BlueprintEngine(bp, handlers, run_id=rid, context=context)
