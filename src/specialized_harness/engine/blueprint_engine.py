@@ -44,6 +44,7 @@ class BlueprintEngine:
                 policy_cfg.get("max_agentic_recovery_attempts", 1)
             ),
             max_net_loc=int(policy_cfg.get("max_net_loc", 1000)),
+            max_tool_rounds=int(policy_cfg.get("max_tool_rounds", 8)),
         )
         if self.policy.max_ci_rounds > 2:
             raise ValueError("Hard constraint: max_ci_rounds cannot exceed 2")
