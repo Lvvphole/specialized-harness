@@ -6,13 +6,24 @@ This repository provides a reusable, model-agnostic specialized agentic harness.
 
 The coding model is not the authority. The repository, specifications, invariants, tests, policies, and acceptance rules are the authority. The harness exists to enforce that boundary.
 
+## The Three Pillars
+
+| Layer | Fundamental question | Goal |
+|-------|----------------------|------|
+| **Authoritative** | What must be true? | Define correctness, constraints, permissions, and acceptance |
+| **Verifier** | How do we know it is true? | Produce sufficient repository-aware evidence |
+| **Economics** | What is the least costly sufficient way to establish and sustain it? | Optimize total cost of correctness under mandatory floors |
+
+**Authority defines truth. Verification establishes truth. Economics determines the minimum sufficient cost of establishing truth.**
+
 ## Authority Documents
 
 | Document | Purpose |
 |----------|---------|
 | [AGENTS.md](AGENTS.md) | Primary behavioral contract, five questions, and invariants |
 | [CONSTRAINTS.md](CONSTRAINTS.md) | Hard limits and non-negotiable policies |
-| [VERIFICATION.md](VERIFICATION.md) | Repository-aware hybrid verifier (algorithmic + bounded agentic) |
+| [VERIFICATION.md](VERIFICATION.md) | Repository-aware hybrid verifier (three loops) |
+| [ECONOMICS.md](ECONOMICS.md) | Total cost of correctness, Minimum Sufficient Harness Principle |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System design as authoritative governor |
 | [BLUEPRINTS.md](BLUEPRINTS.md) | Blueprint schema and required workflows |
 | [OBSERVABILITY.md](OBSERVABILITY.md) | Trajectories, metrics, and evaluation |
@@ -25,10 +36,10 @@ These documents are the source of truth. Runtime code must enforce them.
 - **Authoritative governance**: resolve → constrain → execute → verify → decide
 - **Independent declaration of success**: the model that wrote the code does not get to declare completion
 - **Hybrid verification**: algorithmic checks + bounded agentic review under an explicit verification contract, with evidence reconciliation
-- **Hybrid control**: Agentic nodes propose within bounds; deterministic nodes enforce authority, constraints, and verification
+- **Three verification loops**: Agentic (semantic), CI (executable), Maintenance (repository health over time)
+- **Minimum Sufficient Harness**: every control must earn its place; cheapest sufficient path is selected at runtime
 - **Hard limits**: at most two CI rounds; ≤ 1,000 net LOC per sprint; isolation boundary
-- **Model-agnostic**: any model that supports tool calling can be used
-- **Minimum sufficient control surface**: every control must earn its place
+- **Model-agnostic**: any model that supports tool calling can be used; model selection is economically governed
 - **Full trajectory + Evidence Ledger**: every node and every claim is inspectable
 
 ## The Five Questions the Harness Must Answer
@@ -57,9 +68,9 @@ specialized-harness run \
 
 ```
 specialized-harness/
-├── AGENTS.md, CONSTRAINTS.md, VERIFICATION.md, ARCHITECTURE.md, ...
+├── AGENTS.md, CONSTRAINTS.md, VERIFICATION.md, ECONOMICS.md, ...
 ├── blueprints/               # Concrete blueprint definitions
-├── src/specialized_harness/  # Engine, nodes, sandboxes, policy, verifier
+├── src/specialized_harness/  # Engine, nodes, sandboxes, policy, verifier, economics
 ├── configs/                  # Monorepo overlays
 ├── tests/                    # Unit, integration, blueprint regression
 └── docs/
@@ -69,7 +80,7 @@ specialized-harness/
 
 This harness is intended for organizations that already possess strong local verification, selective CI, and a culture of human review when residual judgment is required. It does not attempt to replace human review as the final merge gate; it produces a process-compliant, independently verified change (or an explicit handoff) that is ready for that review.
 
-The reliability guarantees come from authority resolution, constraint, hybrid verification, and independent decision — not from the model.
+The reliability guarantees come from authority resolution, constraint, hybrid verification, independent decision, and economic governance — not from the model.
 
 ## License
 
