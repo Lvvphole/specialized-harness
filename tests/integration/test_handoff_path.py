@@ -1,6 +1,7 @@
 """Integration: HUMAN_HANDOFF path against always_fail_ci fixture."""
 from pathlib import Path
-from specialized_harness.engine.models import FinalStatus, ExitStatus
+
+from specialized_harness.engine.models import ExitStatus, FinalStatus
 from specialized_harness.runner import run_fixture_task
 
 ROOT = Path(__file__).resolve().parents[2]

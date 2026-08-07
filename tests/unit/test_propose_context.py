@@ -1,5 +1,6 @@
 """S6-1: optional propose context from evidence."""
 import json
+
 from specialized_harness.providers.context import build_propose_body
 from specialized_harness.providers.http import HttpAgentProvider
 from specialized_harness.providers.scripted import ScriptedProvider

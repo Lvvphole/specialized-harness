@@ -1,5 +1,6 @@
 """Net LOC measurement unit tests."""
 from pathlib import Path
+
 from specialized_harness.nodes.deterministic.loc import measure_net_loc, snapshot_text_files
 
 

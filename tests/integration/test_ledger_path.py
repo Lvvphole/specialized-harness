@@ -1,5 +1,6 @@
 """Integration: ACCEPT/HANDOFF carry ledger claims (AGENTS.md independent declaration)."""
 from pathlib import Path
+
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
 

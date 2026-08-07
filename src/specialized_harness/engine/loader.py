@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
-import yaml
 
+import yaml
 
 REQUIRED_TOP = ("apiVersion", "kind", "metadata", "spec")
 REQUIRED_SPEC = ("policy", "nodes", "edges")

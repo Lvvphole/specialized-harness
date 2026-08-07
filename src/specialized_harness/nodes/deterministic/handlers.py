@@ -1,8 +1,9 @@
 """Deterministic node handlers (authority, verify, git, decide)."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from specialized_harness.engine.models import FinalStatus, NodeResult
 from specialized_harness.nodes.deterministic import git_ops

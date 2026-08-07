@@ -4,7 +4,6 @@ from __future__ import annotations
 from collections import Counter
 from pathlib import Path
 
-
 IGNORE_NAMES = {"__pycache__", ".git", ".pytest_cache", ".ruff_cache"}
 IGNORE_SUFFIXES = {".pyc"}
 

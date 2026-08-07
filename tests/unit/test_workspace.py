@@ -1,7 +1,13 @@
 """Workspace sandbox isolation tests (Sprint 2 / S2-1)."""
 from pathlib import Path
+
 import pytest
-from specialized_harness.sandboxes.workspace import WorkspaceError, WorkspaceSandbox, fingerprint_tree
+
+from specialized_harness.sandboxes.workspace import (
+    WorkspaceError,
+    WorkspaceSandbox,
+    fingerprint_tree,
+)
 
 
 def test_provision_copies_not_links(tmp_path: Path):
