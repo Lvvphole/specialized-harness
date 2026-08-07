@@ -61,9 +61,6 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
             return ok(checks=["syntax"], **meta)
         return fail(f"syntax check failed: {result.stdout}", **meta)
 
-    def run_local_linters(ctx: dict[str, Any]) -> NodeResult:
-        return run_local_verification(ctx)
-
     def git_push(ctx: dict[str, Any]) -> NodeResult:
         sandbox: WorkspaceSandbox | None = ctx.get("sandbox")
         branch = f"harness/{ctx['run_id'][:8]}"
@@ -132,9 +129,6 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
             return ok(tests_passed=True, **meta)
         return fail("pytest failed in workspace", tests_passed=False, **meta)
 
-    def selective_ci(ctx: dict[str, Any]) -> NodeResult:
-        return selective_ci_and_verify_outcome(ctx)
-
     def decide_accept_or_handoff(ctx: dict[str, Any]) -> NodeResult:
         policy = ctx["policy"]
         evidence = ctx.get("evidence", {})
@@ -188,32 +182,13 @@ def build_deterministic_handlers(task_dir: Path) -> dict[str, Handler]:
             return ok(final_status=FinalStatus.HUMAN_HANDOFF.value, last_ci_ok=False)
         return ok(final_status=FinalStatus.FAILED.value, reason="no CI evidence")
 
-    def create_pull_request(ctx: dict[str, Any]) -> NodeResult:
-        evidence = ctx.setdefault("evidence", {})
-        evidence["pr_skipped"] = True
-        evidence["pr_skip_reason"] = "no_remote_configured"
-        result = decide_accept_or_handoff(ctx)
-        result.metadata = {
-            **result.metadata,
-            "remote_pr": False,
-            "remote_pr_skipped": True,
-            "skip_reason": "no_remote_configured",
-        }
-        return result
-
-    def hydrate_context(ctx: dict[str, Any]) -> NodeResult:
-        return ok()
-
     return {
         "resolve_authority": resolve_authority,
         "constrain_scope": constrain_scope,
         "provision_sandbox": provision_sandbox,
-        "hydrate_context": hydrate_context,
         "run_local_verification": run_local_verification,
-        "run_local_linters": run_local_linters,
         "git_push": git_push,
         "selective_ci_and_verify_outcome": selective_ci_and_verify_outcome,
-        "selective_ci": selective_ci,
+        "selective_ci": selective_ci_and_verify_outcome,  # alias for engine policy checks
         "decide_accept_or_handoff": decide_accept_or_handoff,
-        "create_pull_request": create_pull_request,
     }
