@@ -5,7 +5,7 @@
 **Last Updated**: 2026-08-06  
 **Scope**: Authoritative coding-agent harness — deterministic governance of probabilistic generation
 
-This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, BLUEPRINTS.md, OBSERVABILITY.md, SECURITY.md) are subordinate to the invariants defined here.
+This document is the primary behavioral authority for any agent operating inside this harness. All other documents (ARCHITECTURE.md, CONSTRAINTS.md, VERIFICATION.md, BLUEPRINTS.md, OBSERVABILITY.md, SECURITY.md) are subordinate to the invariants defined here.
 
 ---
 
@@ -97,7 +97,7 @@ The agent may change only what it has been explicitly authorized to change. The 
 Protected system invariants (compilation, types, lint rules, contracts, schemas, security rules, and repository-specific constraints) are enforced by deterministic mechanisms. Model statements that contradict deterministic results are ignored for control-flow purposes.
 
 ### 2.4 Outcome Verification
-Success is measured against the desired state defined by the authoritative sources. “Code was produced,” “the command exited 0,” or “the model claims the task is done” are insufficient.
+Success is measured against the desired state defined by the authoritative sources. “Code was produced,” “the command exited 0,” or “the model claims the task is done” are insufficient. Verification is performed by the hybrid verifier defined in VERIFICATION.md.
 
 ### 2.5 Independent Declaration of Success
 The model that generated the implementation does not get to declare completion. Completion is declared only by:
@@ -158,7 +158,7 @@ Given a supported coding task, the harness can:
 1. Deterministically establish the applicable authority,
 2. Constrain execution to the authorized scope,
 3. Produce or obtain an implementation,
-4. Independently test the required outcome and protected invariants,
+4. Independently verify the required outcome and protected invariants (see VERIFICATION.md),
 5. Reject unsupported claims of completion, and
 6. Emit sufficient evidence to explain why the change was accepted or rejected.
 
@@ -184,7 +184,7 @@ This harness is deliberately model-agnostic. Any model that can follow tool-call
 ## 7. Authority Hierarchy
 
 1. This file (AGENTS.md)
-2. CONSTRAINTS.md
+2. CONSTRAINTS.md and VERIFICATION.md (parallel; both subordinate only to AGENTS.md)
 3. ARCHITECTURE.md
 4. BLUEPRINTS.md + individual blueprint definitions
 5. Runtime configuration and monorepo-specific overlays
