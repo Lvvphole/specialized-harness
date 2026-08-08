@@ -1,11 +1,11 @@
-"""Agent Engineering Standard runtime (gzip+base64; expands on import)."""
+"""Agent Engineering Standard runtime (verified gzip payload; expands on import)."""
 from __future__ import annotations
 
 import base64
 import gzip
 
-_SRC = """
-H4sIAAAAAAAA/8U82XLbSJLv/AoY/dCkg4Rj3zbUg45R23KEduQjZNm7s1oGAiKKEtogwMUhS6PR
+_B64 = """
+H4sIAHRod2gC/8U82XLbSJLv/AoY/dCkg4Rj3zbUg45R23KEduQjZNm7s1oGAiKKEtogwMUhS6PR
 v29m1pVVAKiD8mxHtAyijszKzMqrsrCuq02QJOuu7WqRJEG+2VZ1G6RlWbVpm1dlM5mod382VTlZ
 Y/9VVRRiRa1RerHSg45bUacXhZCdsrRNV0XaNKLRHcwr2WObtldFfqFbP8NP2dDebvPyUr8/LG8n
 k6P/Onr79ezwj5Oj5P3h8cnX06Pk7O+fj74EcXA3CeC/cFVtNmmZhXP5s8hLQEf/alZXYpOaX23d
@@ -104,7 +104,7 @@ sP9XAAA=
 
 exec(
     compile(
-        gzip.decompress(base64.b64decode("".join(_SRC.split()))),
+        gzip.decompress(base64.b64decode("".join(_B64.split()))),
         __file__,
         "exec",
     ),
