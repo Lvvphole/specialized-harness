@@ -1,15 +1,11 @@
-"""Agent Engineering Standard runtime (shipped compressed; expands on import)."""
+"""Agent Engineering Standard runtime (gzip+base64; expands on import)."""
 from __future__ import annotations
 
 import base64
 import gzip
 
-exec(
-    compile(
-        gzip.decompress(
-            base64.b64decode(
-                """
-H4sIACNnd2oC/8U82XLbSJLv/AoY/dCkg4Rj3zbUg45R23KEduQjZNm7s1oGAiKKEtogwMUhS6PR
+_SRC = """
+H4sIAAAAAAAA/8U82XLbSJLv/AoY/dCkg4Rj3zbUg45R23KEduQjZNm7s1oGAiKKEtogwMUhS6PR
 v29m1pVVAKiD8mxHtAyijszKzMqrsrCuq02QJOuu7WqRJEG+2VZ1G6RlWbVpm1dlM5mod382VTlZ
 Y/9VVRRiRa1RerHSg45bUacXhZCdsrRNV0XaNKLRHcwr2WObtldFfqFbP8NP2dDebvPyUr8/LG8n
 k6P/Onr79ezwj5Oj5P3h8cnX06Pk7O+fj74EcXA3CeC/cFVtNmmZhXP5s8hLQEf/alZXYpOaX23d
@@ -101,12 +97,14 @@ uvp5v9QNVgjGkfjLm2FR66mG8H/KMPqzysspTTDjMYm50ZCsues9avfpmkOiP7j2ov6AbbPE09da
 8L9T9YGqrmkXebnAb/BJmuvLG8SF1IsU8PIGBAWEd2TVL5b5yLsmMu2Ql6uiy+T9lzr9IftDo777
 0YhtCiGxwI+6neH5pCxrp/scZlI6Puw2mxTTL1QoK7YFyrdzOV1cw/6kKyJDq3yW+7NJW0C46Ztt
 R0DJoO6sRzr4f7Gu7Cb9Iw2sM1fvYwowpxXTR09IzOs73AbOroU+Eopi0y634JnVI8+tHDFD92eI
-nOfnMkNFPy/NCHnMM/FPW/SuGk2vPMsXSJjS/b1n3d71L5WBRTIUvPdt7demr7PAMG+7FnNo2DKs
+nOfnMkNFPy/NCHnMM/FPW/SuGk2vPMsXSBjS/b1n3d71L5WBRTIUvPdt7demr7PAMG+7FnNo2DKs
 e3wfAPWhdCQuwCX6IW/HoQ+BKWe6FLil0m/81AZblfJXsMQtGjTD3DAO0vNfaBpdyj9sJv8PuuBz
 sP9XAAA=
-""".replace("\n", "")
-            )
-        ),
+"""
+
+exec(
+    compile(
+        gzip.decompress(base64.b64decode("".join(_SRC.split()))),
         __file__,
         "exec",
     ),
