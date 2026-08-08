@@ -58,10 +58,13 @@ def test_rejected_designs_not_in_ordinary_context(
 def test_runtime_render_excludes_sources_and_paths(
     standard: AgentEngineeringStandard,
 ) -> None:
+    # Rendered guidance must not leak source citations or schema path fields.
+    # (Instruction prose may still use the English word "paths".)
     bundle = standard.compile_context(profile="bug-fix", language="typescript")
-    assert "sources" not in bundle.text
-    assert "paths" not in bundle.text
     assert "CleanCode" not in bundle.text
+    assert "\"sources\"" not in bundle.text
+    assert "applies_to.paths" not in bundle.text
+    assert "<engineering_standard>" in bundle.text
 
 
 def test_standard_never_returns_verifier_vocabulary_as_a_decision(
