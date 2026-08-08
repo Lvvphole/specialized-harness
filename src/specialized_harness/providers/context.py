@@ -39,4 +39,14 @@ def build_propose_body(
         body["last_ci_stdout"] = str(stdout)[:2000]
     if observations is not None:
         body["observations"] = observations
+    # Candidate-construction guidance only — never acceptance authority.
+    std_text = context.get("agent_standard_text")
+    if std_text:
+        body["agent_standard_context"] = str(std_text)
+    std_ids = context.get("agent_standard_rule_ids")
+    if std_ids:
+        body["agent_standard_rule_ids"] = list(std_ids)
+    gid = context.get("agent_standard_governing_context_id")
+    if gid:
+        body["agent_standard_governing_context_id"] = gid
     return body

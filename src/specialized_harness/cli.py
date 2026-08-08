@@ -46,6 +46,8 @@ def _resolve_run_args(args: argparse.Namespace, cfg) -> dict:
         "provider_url": provider_url,
         "runs_dir": runs_dir,
         "allow_repo_mode": allow_repo_mode,
+        "profile": getattr(args, "profile", None),
+        "language": getattr(args, "language", None),
     }
 
 
@@ -82,6 +84,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Proposal source: scripted | http (default: config or scripted)",
     )
     run_p.add_argument("--provider-url", default=None)
+    run_p.add_argument(
+        "--profile",
+        default=None,
+        help="Agent Engineering Standard profile (default: general)",
+    )
+    run_p.add_argument(
+        "--language",
+        default=None,
+        help="Optional language overlay (e.g. python, typescript)",
+    )
     run_p.add_argument("--config", default=None, help="Path to YAML config")
     run_p.add_argument(
         "--runs-dir",
@@ -125,6 +137,8 @@ def main(argv: list[str] | None = None) -> int:
             runs_dir=resolved["runs_dir"],
             provider=provider,
             allow_repo_mode=resolved.get("allow_repo_mode", False),
+            profile=resolved.get("profile"),
+            language=resolved.get("language"),
         )
         claims: list = []
         run_json = Path(resolved["runs_dir"]) / result.run_id / "run.json"
