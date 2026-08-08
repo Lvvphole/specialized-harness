@@ -1,0 +1,14 @@
+{
+  "id": "standard-maintenance",
+  "preload": [
+    "RD-001",
+    "RD-002",
+    "RD-003",
+    "RD-004",
+    "RD-005",
+    "RD-006",
+    "RD-007",
+    "RD-008"
+  ],
+  "notes": "Loads meta-rules that prevent ruleset/harness re-expansion. Separate from engineering ground truths."
+}
