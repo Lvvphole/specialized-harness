@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from specialized_harness.agent_standard.inject import attach_standard_to_context
 from specialized_harness.authority import resolve_task_authority
 from specialized_harness.engine.blueprint_engine import BlueprintEngine
 from specialized_harness.engine.loader import load_blueprint
@@ -30,6 +31,8 @@ def run_fixture_task(
     provider_url: str | None = None,
     allow_repo_mode: bool = False,
     task_brief: str | None = None,
+    profile: str | None = None,
+    language: str | None = None,
 ) -> RunResult:
     """Run a blueprint against a fixture task or a repo+brief authority root."""
     bp = load_blueprint(blueprint_path)
@@ -66,6 +69,13 @@ def run_fixture_task(
     }
     if brief:
         context["task_brief"] = brief
+    attach_standard_to_context(
+        context,
+        profile=profile,
+        language=language,
+        authority_root=root,
+        required=False,
+    )
     try:
         engine = BlueprintEngine(bp, handlers, run_id=rid, context=context)
         result = engine.run()
