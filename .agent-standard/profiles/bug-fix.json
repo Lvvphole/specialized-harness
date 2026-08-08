@@ -1,0 +1,9 @@
+{
+  "id": "bug-fix",
+  "description": "Defect repair under existing architecture.",
+  "extends": null,
+  "include_domains": ["requirements", "software-construction", "refactoring-testing"],
+  "include_levels": ["MUST", "SHOULD"],
+  "kernel_only": false,
+  "language_overlay": null
+}

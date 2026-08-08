@@ -1,0 +1,9 @@
+{
+  "id": "overlay-python",
+  "description": "Python language overlay.",
+  "extends": null,
+  "include_domains": ["languages/python"],
+  "include_levels": ["MUST", "SHOULD"],
+  "kernel_only": false,
+  "language_overlay": "python"
+}

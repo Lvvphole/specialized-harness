@@ -1,0 +1,9 @@
+{
+  "id": "general",
+  "description": "Exact kernel only. Used when profile is unspecified.",
+  "extends": null,
+  "include_domains": [],
+  "include_levels": ["MUST"],
+  "kernel_only": true,
+  "language_overlay": null
+}
