@@ -1,12 +1,10 @@
-"""Agent Engineering Standard runtime (base64 parts; expands on import)."""
+"""Agent Engineering Standard runtime (chunked plain source)."""
 from __future__ import annotations
 
-import base64
+from specialized_harness.agent_standard._rt0 import CHUNK as C0
+from specialized_harness.agent_standard._rt1 import CHUNK as C1
+from specialized_harness.agent_standard._rt2 import CHUNK as C2
+from specialized_harness.agent_standard._rt3 import CHUNK as C3
+from specialized_harness.agent_standard._rt4 import CHUNK as C4
 
-from specialized_harness.agent_standard._b0 import B as B0
-from specialized_harness.agent_standard._b1 import B as B1
-from specialized_harness.agent_standard._b2 import B as B2
-from specialized_harness.agent_standard._b3 import B as B3
-from specialized_harness.agent_standard._b4 import B as B4
-
-exec(compile(base64.b64decode(B0 + B1 + B2 + B3 + B4), __file__, "exec"), globals())
+exec(compile(C0 + C1 + C2 + C3 + C4, __file__, "exec"), globals())
