@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Engineering Standard Profile",
+  "type": "object",
+  "required": [
+    "id",
+    "preload"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "preload": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
