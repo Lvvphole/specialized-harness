@@ -6,8 +6,8 @@ Protocol (HttpAgentProvider):
   Response: either {"tool_calls":[...]} or {"mutations":[...], "plan_summary": "..."}
 
 If OPENAI_API_KEY is set, attempts a real model propose (mutations only).
-Otherwise: multi-round tool rehearsal that repairs the known samples/repo_add bug
-after reading app.py via observations (not in-process ScriptedProvider).
+Otherwise: multi-round tool rehearsal that repairs the known samples/repo_add or
+samples/repo_mul bug after reading app.py via observations (not in-process ScriptedProvider).
 
 Never declares ACCEPT — harness ledger + CI only (AGENTS.md).
 """
@@ -99,24 +99,31 @@ def _openai_propose(body: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _rehearsal_propose(body: dict[str, Any]) -> dict[str, Any]:
-    """Deterministic multi-round path for samples/repo_add when no model key."""
+    """Deterministic multi-round path for samples/repo_add and samples/repo_mul when no model key."""
     node = str(body.get("node_id") or "")
     round_i = int(body.get("round") or 0)
     obs = body.get("observations") or []
     task = f"{body.get('task') or ''} {body.get('task_brief') or ''}".lower()
+    wants_mul = "multiply" in task or "repo_mul" in task
 
     if node == "plan" and round_i == 0 and not obs:
+        query = "def multiply" if wants_mul else "def add"
         return {
             "tool_calls": [
                 {"id": "p1", "name": "list_dir", "arguments": {"path": "."}},
-                {"id": "p2", "name": "search_code", "arguments": {"query": "def add"}},
+                {"id": "p2", "name": "search_code", "arguments": {"query": query}},
             ],
             "token_usage": {"prompt": 0, "completion": 0},
             "_source": "rehearsal",
         }
     if node == "plan":
+        summary = (
+            "Inspect app.py; fix multiply to return a*b; leave tests as authority."
+            if wants_mul
+            else "Inspect app.py; fix add to return a+b; leave tests as authority."
+        )
         return {
-            "plan_summary": "Inspect app.py; fix add to return a+b; leave tests as authority.",
+            "plan_summary": summary,
             "mutations": [],
             "token_usage": {"prompt": 0, "completion": 0},
             "_source": "rehearsal",
@@ -132,19 +139,30 @@ def _rehearsal_propose(body: dict[str, Any]) -> dict[str, Any]:
             "_source": "rehearsal",
         }
 
+    if wants_mul:
+        fixed = (
+            "def multiply(a, b):\n"
+            '    """Return the product of a and b."""\n'
+            "    return a * b\n"
+        )
+        return {
+            "plan_summary": "Repair multiply to return a*b after reading workspace files.",
+            "mutations": [{"path": "app.py", "content": fixed}],
+            "token_usage": {"prompt": 12, "completion": 24},
+            "_source": "rehearsal",
+        }
+
     fixed = (
         "def add(a, b):\n"
         '    """Return the sum of a and b."""\n'
         "    return a + b\n"
     )
-    if "add" in task or "broken" in task or "fix" in task or obs or True:
-        return {
-            "plan_summary": "Repair add to return a+b after reading workspace files.",
-            "mutations": [{"path": "app.py", "content": fixed}],
-            "token_usage": {"prompt": 12, "completion": 24},
-            "_source": "rehearsal",
-        }
-    return {"plan_summary": "noop", "mutations": [], "_source": "rehearsal"}
+    return {
+        "plan_summary": "Repair add to return a+b after reading workspace files.",
+        "mutations": [{"path": "app.py", "content": fixed}],
+        "token_usage": {"prompt": 12, "completion": 24},
+        "_source": "rehearsal",
+    }
 
 
 def handle_propose(body: dict[str, Any]) -> dict[str, Any]:
