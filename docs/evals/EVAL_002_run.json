@@ -1,0 +1,64 @@
+{
+  "run_id": "af60d7e1-8ca1-4d22-a2ac-cff01607eac3",
+  "final_status": "ACCEPT",
+  "trajectory_len": 12,
+  "nodes": [
+    "resolve_authority",
+    "constrain_scope",
+    "provision",
+    "plan",
+    "implement",
+    "local_verify",
+    "push",
+    "ci_round",
+    "fix_ci",
+    "push",
+    "ci_round",
+    "decide"
+  ],
+  "error": null,
+  "total_ms": 23987,
+  "task": "Fix the broken add function",
+  "provider": "http",
+  "claims": [
+    {
+      "claim_id": "loc_within_budget",
+      "mandatory": true,
+      "method": "measure_net_loc",
+      "observation": "net_loc=3",
+      "subject": "workspace_diff",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "syntax_clean",
+      "mandatory": true,
+      "method": "py_compile",
+      "observation": "compiled 3 files",
+      "subject": "workspace_python",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "tests_pass",
+      "mandatory": true,
+      "method": "pytest",
+      "observation": "F [100%]\n=========================== short test summary info ===========================\nFAILED test_app.py::test_add - assert -1 == 5\n1 failed in 0.03s\n",
+      "subject": "workspace_pytest",
+      "verdict": "FAIL"
+    },
+    {
+      "claim_id": "tests_pass",
+      "mandatory": true,
+      "method": "pytest",
+      "observation": ". [100%]\n1 passed in 0.01s\n",
+      "subject": "workspace_pytest",
+      "verdict": "PASS"
+    }
+  ],
+  "extra": {
+    "authority_mode": "repo",
+    "provider": "HttpAgentProvider",
+    "mode": "openai",
+    "model": "gpt-4.1-mini",
+    "eval": "EVAL_002"
+  }
+}
