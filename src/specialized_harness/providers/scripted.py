@@ -10,6 +10,11 @@ _FIX_ADD_APP = '''def add(a, b):
     return a + b
 '''
 
+_FIX_MUL_APP = '''def multiply(a, b):
+    """Return the product of a and b."""
+    return a * b
+'''
+
 
 def _wants_fix_add(context: dict[str, Any]) -> bool:
     task = str(context.get("task") or "")
@@ -25,6 +30,22 @@ def _wants_fix_add(context: dict[str, Any]) -> bool:
         or ""
     )
     if "repo_add" in source.replace("\\", "/"):
+        return True
+    return False
+
+
+def _wants_fix_mul(context: dict[str, Any]) -> bool:
+    task = str(context.get("task") or "")
+    brief = str(context.get("task_brief") or "")
+    blob = f"{task} {brief}".lower()
+    if "multiply" in blob and ("fix" in blob or "broken" in blob or "repair" in blob):
+        return True
+    source = str(
+        context.get("fixture_source")
+        or (context.get("authority") or {}).get("root")
+        or ""
+    )
+    if "repo_mul" in source.replace("\\", "/"):
         return True
     return False
 
@@ -55,6 +76,15 @@ class ScriptedProvider:
                     except Exception:
                         pass
                 mutations.append(FileMutation(path="app.py", content=_FIX_ADD_APP))
+            if _wants_fix_mul(context):
+                inspect = context.get("repo_inspect")
+                if inspect is not None:
+                    try:
+                        inspect.read_file("app.py")
+                        inspect.search_code("def multiply")
+                    except Exception:
+                        pass
+                mutations.append(FileMutation(path="app.py", content=_FIX_MUL_APP))
             if task == "over_loc":
                 mutations.append(
                     FileMutation(

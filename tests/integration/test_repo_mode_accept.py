@@ -25,3 +25,23 @@ def test_repo_mode_accept_fix_add_sample():
     assert any(e.node_id == "decide" for e in result.trajectory)
     # Sample source must remain broken (isolation)
     assert (SAMPLE / "app.py").read_text().count("a - b") == 1
+
+
+SAMPLE_MUL = ROOT / "samples" / "repo_mul"
+
+
+def test_repo_mode_accept_fix_mul_sample():
+    assert SAMPLE_MUL.is_dir()
+    assert (SAMPLE_MUL / "app.py").read_text().count("a / b") == 1
+
+    result = run_fixture_task(
+        BP,
+        SAMPLE_MUL,
+        "Fix the broken multiply function",
+        allow_repo_mode=True,
+        persist=False,
+    )
+    assert result.final_status == FinalStatus.ACCEPT
+    assert any(e.node_id == "decide" for e in result.trajectory)
+    # Sample source must remain broken (isolation)
+    assert (SAMPLE_MUL / "app.py").read_text().count("a / b") == 1

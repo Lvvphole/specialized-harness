@@ -1,0 +1,116 @@
+{
+  "claims": [
+    {
+      "claim_id": "loc_within_budget",
+      "mandatory": true,
+      "method": "measure_net_loc",
+      "observation": "net_loc=5",
+      "subject": "workspace_diff",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "syntax_clean",
+      "mandatory": true,
+      "method": "py_compile",
+      "observation": "compiled 2 files",
+      "subject": "workspace_python",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "tests_pass",
+      "mandatory": true,
+      "method": "pytest",
+      "observation": ".                                                                        [100%]\n1 passed in 0.01s\n",
+      "subject": "workspace_pytest",
+      "verdict": "PASS"
+    }
+  ],
+  "error": null,
+  "extra": {},
+  "final_status": "ACCEPT",
+  "run_id": "e6c82274-fe77-4999-96b1-6bf78ab57c4e",
+  "total_ms": 325,
+  "trajectory": [
+    {
+      "node_id": "resolve_authority",
+      "sequence": 1,
+      "node_type": "deterministic",
+      "duration_ms": 1,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "constrain_scope",
+      "sequence": 2,
+      "node_type": "deterministic",
+      "duration_ms": 0,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "provision",
+      "sequence": 3,
+      "node_type": "deterministic",
+      "duration_ms": 5,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "plan",
+      "sequence": 4,
+      "node_type": "agentic",
+      "duration_ms": 1,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "implement",
+      "sequence": 5,
+      "node_type": "agentic",
+      "duration_ms": 8,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "local_verify",
+      "sequence": 6,
+      "node_type": "deterministic",
+      "duration_ms": 12,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "push",
+      "sequence": 7,
+      "node_type": "deterministic",
+      "duration_ms": 40,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "ci_round",
+      "sequence": 8,
+      "node_type": "deterministic",
+      "duration_ms": 250,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "node_id": "decide",
+      "sequence": 9,
+      "node_type": "deterministic",
+      "duration_ms": 1,
+      "exit_status": "ok",
+      "token_usage": {},
+      "tools_called": []
+    }
+  ]
+}
