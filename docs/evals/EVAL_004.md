@@ -2,7 +2,7 @@
 
 **Date**: 2026-08-09  
 **Authority**: AGENTS.md · GOAL.md · STATUS.md §4 · OBSERVABILITY.md  
-**Run id**: `ca5237d3-a77a-44cd-9242-9c0259087987`  
+**Run id**: `1baec317-bc15-4796-95cb-9105d315943c`  
 **Artifact**: [`docs/evals/EVAL_004_run.json`](EVAL_004_run.json) (immutable tracked copy of the full persisted run; `artifacts/` remains gitignored)
 
 ## Design
@@ -23,7 +23,7 @@ Closes the live-path bar for the second sample under the same independent-ACCEPT
 | Field | Value |
 |-------|--------|
 | **final_status** | **ACCEPT** |
-| total_ms | 325 |
+| total_ms | 560 |
 | trajectory_len | 9 |
 | trajectory | resolve_authority → constrain_scope → provision → plan → implement → local_verify → push → ci_round → decide |
 | Claims | `loc_within_budget` PASS (net_loc=4); `syntax_clean` PASS; `tests_pass` PASS |

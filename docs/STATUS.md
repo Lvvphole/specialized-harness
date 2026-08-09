@@ -28,7 +28,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 - **ACCEPT** — fixture product-code repair (`fix_add`)
 - **ACCEPT (repo mode, offline + live)** — `samples/repo_add` via `--repo` + brief
 - **ACCEPT (repo mode, offline)** — `samples/repo_mul` via `--repo` + brief (EVAL_003; second sample)
-- **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `ca5237d3-a77a-44cd-9242-9c0259087987`)
+- **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
