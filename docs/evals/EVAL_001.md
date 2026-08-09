@@ -3,7 +3,7 @@
 **Date**: 2026-08-09  
 **Authority**: AGENTS.md · GOAL.md · STATUS.md §4 · OBSERVABILITY.md  
 **Run id**: `a032ba27-838d-4a9f-ae7d-a12db2bc32b8`  
-**Artifact**: `artifacts/runs/a032ba27-838d-4a9f-ae7d-a12db2bc32b8/run.json`
+**Artifact**: [`docs/evals/EVAL_001_run.json`](EVAL_001_run.json) (immutable tracked copy; `artifacts/` remains gitignored)
 
 ## Design
 
