@@ -27,10 +27,11 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 
 - **ACCEPT** — fixture product-code repair (`fix_add`)
 - **ACCEPT (repo mode, offline + live)** — `samples/repo_add` via `--repo` + brief
+- **ACCEPT (repo mode, offline)** — `samples/repo_mul` via `--repo` + brief (EVAL_003; second sample)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
-**Suite**: `pytest` **117 passed**.
+**Suite**: `pytest` **118 passed**.
 
 **Operator UX**
 
@@ -76,6 +77,6 @@ LLMs/agents open PRs only. **Only a human** (@Lvvphole or designate) merges to `
 
 ## 4. Next product moves (when justified)
 
-1. Broader task corpus under the same independent-ACCEPT contract (EVAL_003+).
+1. Live-model confirmation on second sample + further corpus growth (EVAL_003+).
 2. Selective CI / path policies when a monorepo demands it.
 3. Admit controls only when they improve Cost per Verified Correct Outcome.
