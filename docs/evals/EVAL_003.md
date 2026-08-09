@@ -2,7 +2,7 @@
 
 **Date**: 2026-08-09  
 **Authority**: AGENTS.md · GOAL.md · STATUS.md §4 · OBSERVABILITY.md  
-**Run id**: `99756044-9d59-4011-a736-251b19733582`  
+**Run id**: `e6c82274-fe77-4999-96b1-6bf78ab57c4e`  
 **Artifact**: [`docs/evals/EVAL_003_run.json`](EVAL_003_run.json) (immutable tracked copy of the full persisted run; `artifacts/` remains gitignored)
 
 ## Design
@@ -23,7 +23,7 @@ Bug class is distinct from `repo_add` (arithmetic operator / multiply vs add). S
 | Field | Value |
 |-------|--------|
 | **final_status** | **ACCEPT** |
-| total_ms | 344 |
+| total_ms | 325 |
 | trajectory_len | 9 |
 | trajectory | resolve_authority → constrain_scope → provision → plan → implement → local_verify → push → ci_round → decide |
 | Claims | `loc_within_budget` PASS; `syntax_clean` PASS; `tests_pass` PASS |
