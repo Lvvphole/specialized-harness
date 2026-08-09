@@ -29,7 +29,8 @@
   "extra": {
     "authority_mode": "repo",
     "provider": "HttpAgentProvider",
-    "task": "Read src/calculator/__init__.py first. Change only the return of add from (a - b) to (a + b). Keep the mul function and all other text identical. Do not touch tests, conftest, or any other path."
+    "task": "Read src/calculator/__init__.py first. Change only the return of add from (a - b) to (a + b). Keep the mul function and all other text identical. Do not touch tests, conftest, or any other path.",
+    "eval_note": "ACCEPT is ledger+pytest only. net_loc=12 does not prove exact one-line edit; no exact-diff gate in harness."
   },
   "final_status": "ACCEPT",
   "run_id": "7a7c8344-cf3f-4726-b6a8-776ca031abd6",
@@ -46,7 +47,7 @@
         "authority_mode": "repo",
         "authority_sources": [
           "repo",
-          "C:\\Users\\Emory Harris\\projects\\software-factory\\examples\\demo-target",
+          "<REPO_ROOT>/examples/demo-target",
           "task_brief"
         ]
       },
@@ -68,7 +69,7 @@
       "finished_at": "2026-08-09T16:29:03.092454+00:00",
       "metadata": {
         "allowed_paths": [
-          "C:\\Users\\Emory Harris\\projects\\software-factory\\examples\\demo-target"
+          "<REPO_ROOT>/examples/demo-target"
         ]
       },
       "node_id": "constrain_scope",
@@ -88,8 +89,8 @@
       "exit_status": "success",
       "finished_at": "2026-08-09T16:29:03.121144+00:00",
       "metadata": {
-        "sandbox": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace",
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "sandbox": "<SANDBOX>/workspace",
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "provision",
       "node_type": "deterministic",
@@ -113,7 +114,7 @@
           "completion": 97,
           "prompt": 1305
         },
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "plan",
       "node_type": "agentic",
@@ -164,7 +165,7 @@
               {
                 "name": "read_file",
                 "ok": true,
-                "result": "\"\"\"Tiny calculator. Contains a deliberate bug for the Software Factory demo.\"\"\"\r\n\r\n\r\ndef add(a: int, b: int) -> int:\r\n    # BUG: should be a + b. Coding executor should fix this.\r\n    return a - b\r\n\r\n\r\ndef mul(a: int, b: int) -> int:\r\n    return a * b\r\n",
+                "result": "\"\"\"Tiny calculator. Contains a deliberate bug for the Software Factory demo.\"\"\"\n\ndef add(a: int, b: int) -> int:\n    # BUG: should be a + b. Coding executor should fix this.\n    return a - b\n\ndef mul(a: int, b: int) -> int:\n    return a * b\n",
                 "tool_call_id": "t1"
               }
             ],
@@ -184,7 +185,7 @@
           "read_file:src/calculator/__init__.py"
         ],
         "total_http_ms": 3317,
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "implement",
       "node_type": "agentic",
@@ -232,7 +233,7 @@
         "command": "py_compile",
         "exit_code": 0,
         "stdout": "compiled 3 files",
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "local_verify",
       "node_type": "deterministic",
@@ -256,7 +257,7 @@
         "remote_push": false,
         "remote_push_skipped": true,
         "skip_reason": "no_remote_configured",
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "push",
       "node_type": "deterministic",
@@ -301,12 +302,12 @@
             "verdict": "PASS"
           }
         ],
-        "command": "C:\\Python314\\python.exe -m pytest -q --tb=no",
+        "command": "<PYTHON> -m pytest -q --tb=no",
         "exit_code": 0,
         "stderr": "",
         "stdout": "..                                                                       [100%]\n2 passed in 0.02s\n",
         "tests_passed": true,
-        "workspace": "C:\\Users\\Emory Harris\\AppData\\Local\\Temp\\harness-7a7c8344-vciiz5wk\\workspace"
+        "workspace": "<SANDBOX>/workspace"
       },
       "node_id": "ci_round",
       "node_type": "deterministic",
