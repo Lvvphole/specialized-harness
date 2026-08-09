@@ -3,7 +3,7 @@
 **Date**: 2026-08-09  
 **Authority**: AGENTS.md · GOAL.md · STATUS.md §4 · OBSERVABILITY.md  
 **Run id**: `af60d7e1-8ca1-4d22-a2ac-cff01607eac3`  
-**Artifact**: [`docs/evals/EVAL_002_run.json`](EVAL_002_run.json) (immutable tracked copy; `artifacts/` remains gitignored)
+**Artifact**: [`docs/evals/EVAL_002_run.json`](EVAL_002_run.json) (immutable tracked copy of the full persisted run; `artifacts/` remains gitignored)
 
 ## Design
 
@@ -25,22 +25,34 @@
 | total_ms | 23 987 |
 | trajectory_len | 12 |
 | trajectory | resolve_authority → constrain_scope → provision → plan → implement → local_verify → push → ci_round → fix_ci → push → ci_round → decide |
-| Claims | `loc_within_budget` PASS (net_loc=3); `syntax_clean` PASS; `tests_pass` FAIL then PASS (2 CI rounds) |
-| CI behavior | First pytest failed (`assert -1 == 5`); second round green (1 passed) — within hard max of 2 CI rounds |
-| Source isolation | Workspace-only mutation; sample tree on disk unchanged by design |
+| Claims | `loc_within_budget` PASS (net_loc=3); `syntax_clean` PASS; `tests_pass` FAIL then PASS |
+| CI behavior | Round 1 pytest FAIL (`assert -1 == 5`); `fix_ci` then round 2 PASS — within hard max of 2 CI rounds |
+| implement tools | `search_code`, `read_file(app.py)`; http_rounds=3 |
+| fix_ci tools | `search_code`, `read_file(add.py)`; files_changed includes `app.py` |
+| Source isolation | Disposable workspace under `%TEMP%\harness-af60d7e1-*`; sample tree on disk unchanged by design |
+
+## Token usage (from trajectory)
+
+| Node | prompt | completion |
+|------|--------|------------|
+| plan | 2206 | 105 |
+| implement | 2189 | 121 |
+| fix_ci | 2127 | 175 |
+| **sum (agentic)** | **6522** | **401** |
 
 ## Authority check
 
 - Provider returned **mutations only** — no ACCEPT claim from the model path.
-- Declaration of success: harness ledger + workspace pytest only.
+- Declaration of success: harness ledger + workspace pytest only (`decide` requires `last_ci_ok`).
 - Agent standard attached as candidate guidance only.
-- Two CI rounds used; control surrendered correctly after the second green round → `decide` → ACCEPT.
+- Two CI rounds used; control surrendered after the second green round → ACCEPT.
+- Trajectory complete: every node has `sequence`, `duration_ms`, `token_usage`, `tools_called`, and `metadata` (AGENTS.md §2 supporting invariant 9).
 
 ## Cost / competence note
 
-- Real-model path: non-zero latency (~24 s) vs EVAL_001 rehearsal (557 ms).
-- Demonstrates multi-round repair under the hard CI limit: first implement proposal left tests red; `fix_ci` + second `ci_round` produced green evidence.
-- `token_usage` (if emitted by the provider) is recorded in the full trajectory inside the run artifact; CLI summary did not surface aggregate tokens.
+- Real-model path: ~24 s vs EVAL_001 rehearsal (557 ms).
+- Multi-round repair under the hard CI limit: first implement left tests red; `fix_ci` + second `ci_round` produced green evidence.
+- Full per-node evidence (tools, tokens, isolation paths) is in the tracked run artifact.
 
 ## How to reproduce
 
@@ -61,7 +73,7 @@ py -3 -m specialized_harness.cli run \
   --runs-dir artifacts/runs --json
 ```
 
-Windows / Git Bash note: if `specialized-harness` is not on PATH, use `py -3 -m specialized_harness.cli` as above.
+Windows / Git Bash: if `specialized-harness` is not on PATH, use `py -3 -m specialized_harness.cli` as above.
 
 ## Verdict for harness development
 
@@ -71,5 +83,6 @@ Eval #2 **passes** the STATUS.md live-path bar with a **real model**:
 - Sandbox isolation
 - Independent ACCEPT (ledger + pytest)
 - Hard CI-round limit observed and sufficient for recovery
+- Complete trajectory persisted and tracked
 
-Next: broader task corpus, token accounting visibility in CLI summary, and optional multi-model comparison under the same contract.
+Next: broader task corpus and optional multi-model comparison under the same contract.
