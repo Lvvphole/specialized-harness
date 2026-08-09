@@ -28,6 +28,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 - **ACCEPT** — fixture product-code repair (`fix_add`)
 - **ACCEPT (repo mode, offline + live)** — `samples/repo_add` via `--repo` + brief
 - **ACCEPT (repo mode, offline)** — `samples/repo_mul` via `--repo` + brief (EVAL_003; second sample)
+- **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `ca5237d3-a77a-44cd-9242-9c0259087987`)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
@@ -39,7 +40,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 specialized-harness run fix_add
 specialized-harness run --repo samples/repo_add --task "Fix the broken add function"
 # live path (requires propose server + optional OPENAI_API_KEY):
-# see docs/evals/EVAL_001.md / EVAL_002.md
+# see docs/evals/EVAL_001.md / EVAL_002.md / EVAL_004.md
 ```
 
 ---
@@ -77,6 +78,6 @@ LLMs/agents open PRs only. **Only a human** (@Lvvphole or designate) merges to `
 
 ## 4. Next product moves (when justified)
 
-1. Live-model confirmation on second sample + further corpus growth (EVAL_003+).
+1. Real-model confirmation on second sample (`repo_mul`) + further corpus growth (EVAL_004+).
 2. Selective CI / path policies when a monorepo demands it.
 3. Admit controls only when they improve Cost per Verified Correct Outcome.
