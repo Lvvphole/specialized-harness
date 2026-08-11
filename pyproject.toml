@@ -28,6 +28,9 @@ packages = ["src/specialized_harness"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+  "eval: offline eval / checker-qualification contracts (not live model)",
+]
 
 # A lint gate whose rule set changes when a new ruff is released is not a
 # deterministic gate (AGENTS.md invariant 6). The version is pinned in the dev

@@ -1,6 +1,6 @@
 # STATUS.md — Done boundary (what is shipped vs deferred)
 
-**Date**: 2026-08-09  
+**Date**: 2026-08-11  
 **Authority**: [AGENTS.md](../AGENTS.md) §4 Definition of Done · [GOAL.md](../GOAL.md)  
 **Audience**: Engineers/operators and vibe coders
 
@@ -32,7 +32,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
-**Suite**: `pytest` **118 passed**.
+**Suite**: `pytest` **118 passed** offline contracts; Sprint 8 adds checker-qualification evals (see [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md)).
 
 **Operator UX**
 
@@ -58,6 +58,7 @@ specialized-harness run --repo samples/repo_add --task "Fix the broken add funct
 | Claude Code / other SDK providers | Optional; not required for sample Done |
 | TUI / editor UI | CLI primary |
 | Direct LLM commits to `main` | Forbidden — PRs only (AGENTS.md §8) |
+| promptfoo on ACCEPT path | Eval-only; never gates product ACCEPT |
 
 ---
 
@@ -76,8 +77,20 @@ LLMs/agents open PRs only. **Only a human** (@Lvvphole or designate) merges to `
 
 ---
 
-## 4. Next product moves (when justified)
+## 4. Verification vs Eval (Sprint 8)
+
+See [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md).
+
+| Layer | Question |
+|-------|----------|
+| Verification harness | Does this **candidate** satisfy the contract? |
+| Eval harness | Is this **component** good enough to admit? |
+| Checker qualification | Can this **checker** separate valid from invalid? |
+
+Offline qualification for `syntax_clean` / `tests_pass` ships in `specialized_harness.evals`. **ACCEPT path unchanged.** promptfoo is eval-only if used later.
+
+## 5. Next product moves (when justified)
 
 1. Real-model confirmation on second sample (`repo_mul`) + further corpus growth (EVAL_004+).
 2. Selective CI / path policies when a monorepo demands it.
-3. Admit controls only when they improve Cost per Verified Correct Outcome.
+3. Admit controls only when they improve Cost per Verified Correct Outcome (incl. token profile under matched ACCEPT; OckBench / Gloaguen as calibration only).
