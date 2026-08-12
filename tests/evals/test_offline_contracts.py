@@ -15,6 +15,7 @@ BP = ROOT / "blueprints" / "standard-coding.yaml"
 FIX = ROOT / "fixtures"
 SAMPLE = ROOT / "samples" / "repo_add"
 SAMPLE_STATS = ROOT / "samples" / "repo_stats"
+SAMPLE_SUB = ROOT / "samples" / "repo_sub"
 
 
 @pytest.mark.eval
@@ -58,6 +59,20 @@ def test_eval_accept_repo_mode_package_sample():
         BP,
         SAMPLE_STATS,
         "Fix the broken median function",
+        allow_repo_mode=True,
+        persist=False,
+    )
+    assert r.final_status == FinalStatus.ACCEPT
+
+
+@pytest.mark.eval
+def test_eval_accept_repo_mode_sample_sub():
+    if not SAMPLE_SUB.is_dir():
+        pytest.skip("samples/repo_sub missing")
+    r = run_fixture_task(
+        BP,
+        SAMPLE_SUB,
+        "Fix the broken subtract function",
         allow_repo_mode=True,
         persist=False,
     )

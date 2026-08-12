@@ -15,6 +15,11 @@ _FIX_MUL_APP = '''def multiply(a, b):
     return a * b
 '''
 
+_FIX_SUB_APP = '''def subtract(a, b):
+    """Return the difference of a and b."""
+    return a - b
+'''
+
 _FIX_MEDIAN_CORE = '''"""Descriptive statistics over numeric sequences."""
 
 
@@ -69,6 +74,10 @@ def _wants_fix_median(context: dict[str, Any]) -> bool:
     return _wants_repair(context, "median", "repo_stats")
 
 
+def _wants_fix_sub(context: dict[str, Any]) -> bool:
+    return _wants_repair(context, "subtract", "repo_sub")
+
+
 def _inspect(context: dict[str, Any], path: str, query: str) -> None:
     """Exercise the read-only inspection tools when the harness supplies them."""
     inspect = context.get("repo_inspect")
@@ -104,6 +113,9 @@ class ScriptedProvider:
             if _wants_fix_mul(context):
                 _inspect(context, "app.py", "def multiply")
                 mutations.append(FileMutation(path="app.py", content=_FIX_MUL_APP))
+            if _wants_fix_sub(context):
+                _inspect(context, "app.py", "def subtract")
+                mutations.append(FileMutation(path="app.py", content=_FIX_SUB_APP))
             if _wants_fix_median(context):
                 _inspect(context, "statskit/core.py", "def median")
                 mutations.append(
