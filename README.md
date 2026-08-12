@@ -88,7 +88,7 @@ pip install -e ".[dev]"
 pytest -q
 ```
 
-Expected: `118 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
+Expected: `123 passed`. If the `pytest` on your `PATH` resolves to a different interpreter than the one you installed into, run `python -m pytest -q` instead.
 
 ---
 
@@ -215,7 +215,7 @@ specialized-harness metrics --runs-dir artifacts/runs --json
 ## Development
 
 ```bash
-pytest -q                      # full suite (118 tests)
+pytest -q                      # full suite (123 tests)
 ```
 
 ---

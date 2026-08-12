@@ -15,39 +15,70 @@ _FIX_MUL_APP = '''def multiply(a, b):
     return a * b
 '''
 
+_FIX_MEDIAN_CORE = '''"""Descriptive statistics over numeric sequences."""
 
-def _wants_fix_add(context: dict[str, Any]) -> bool:
+
+def mean(values):
+    """Return the arithmetic mean of values."""
+    if not values:
+        raise ValueError("mean() requires at least one value")
+    return sum(values) / len(values)
+
+
+def median(values):
+    """Return the median of values.
+
+    Even-length inputs average the two middle values.
+    """
+    if not values:
+        raise ValueError("median() requires at least one value")
+    ordered = sorted(values)
+    mid = len(ordered) // 2
+    if len(ordered) % 2 == 1:
+        return ordered[mid]
+    return (ordered[mid - 1] + ordered[mid]) / 2
+'''
+
+
+def _wants_repair(context: dict[str, Any], subject: str, sample_dir: str) -> bool:
+    """True when the brief asks to repair ``subject`` or the source is ``sample_dir``."""
     task = str(context.get("task") or "")
     brief = str(context.get("task_brief") or "")
-    if task == "fix_add":
-        return True
     blob = f"{task} {brief}".lower()
-    if "add" in blob and ("fix" in blob or "broken" in blob or "repair" in blob):
+    if subject in blob and ("fix" in blob or "broken" in blob or "repair" in blob):
         return True
     source = str(
         context.get("fixture_source")
         or (context.get("authority") or {}).get("root")
         or ""
     )
-    if "repo_add" in source.replace("\\", "/"):
+    return sample_dir in source.replace("\\", "/")
+
+
+def _wants_fix_add(context: dict[str, Any]) -> bool:
+    if str(context.get("task") or "") == "fix_add":
         return True
-    return False
+    return _wants_repair(context, "add", "repo_add")
 
 
 def _wants_fix_mul(context: dict[str, Any]) -> bool:
-    task = str(context.get("task") or "")
-    brief = str(context.get("task_brief") or "")
-    blob = f"{task} {brief}".lower()
-    if "multiply" in blob and ("fix" in blob or "broken" in blob or "repair" in blob):
-        return True
-    source = str(
-        context.get("fixture_source")
-        or (context.get("authority") or {}).get("root")
-        or ""
-    )
-    if "repo_mul" in source.replace("\\", "/"):
-        return True
-    return False
+    return _wants_repair(context, "multiply", "repo_mul")
+
+
+def _wants_fix_median(context: dict[str, Any]) -> bool:
+    return _wants_repair(context, "median", "repo_stats")
+
+
+def _inspect(context: dict[str, Any], path: str, query: str) -> None:
+    """Exercise the read-only inspection tools when the harness supplies them."""
+    inspect = context.get("repo_inspect")
+    if inspect is None:
+        return
+    try:
+        inspect.read_file(path)
+        inspect.search_code(query)
+    except Exception:
+        pass
 
 
 class ScriptedProvider:
@@ -68,23 +99,16 @@ class ScriptedProvider:
                 )
             ]
             if _wants_fix_add(context):
-                inspect = context.get("repo_inspect")
-                if inspect is not None:
-                    try:
-                        inspect.read_file("app.py")
-                        inspect.search_code("def add")
-                    except Exception:
-                        pass
+                _inspect(context, "app.py", "def add")
                 mutations.append(FileMutation(path="app.py", content=_FIX_ADD_APP))
             if _wants_fix_mul(context):
-                inspect = context.get("repo_inspect")
-                if inspect is not None:
-                    try:
-                        inspect.read_file("app.py")
-                        inspect.search_code("def multiply")
-                    except Exception:
-                        pass
+                _inspect(context, "app.py", "def multiply")
                 mutations.append(FileMutation(path="app.py", content=_FIX_MUL_APP))
+            if _wants_fix_median(context):
+                _inspect(context, "statskit/core.py", "def median")
+                mutations.append(
+                    FileMutation(path="statskit/core.py", content=_FIX_MEDIAN_CORE)
+                )
             if task == "over_loc":
                 mutations.append(
                     FileMutation(
