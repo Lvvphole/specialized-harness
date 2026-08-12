@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / "blueprints" / "standard-coding.yaml"
 FIX = ROOT / "fixtures"
 SAMPLE = ROOT / "samples" / "repo_add"
+SAMPLE_STATS = ROOT / "samples" / "repo_stats"
 
 
 @pytest.mark.eval
@@ -42,6 +43,21 @@ def test_eval_accept_repo_mode_sample():
         BP,
         SAMPLE,
         "Fix the broken add function",
+        allow_repo_mode=True,
+        persist=False,
+    )
+    assert r.final_status == FinalStatus.ACCEPT
+
+
+@pytest.mark.eval
+def test_eval_accept_repo_mode_package_sample():
+    """Corpus growth: package tree + boundary-case bug (EVAL_007)."""
+    if not SAMPLE_STATS.is_dir():
+        pytest.skip("samples/repo_stats missing")
+    r = run_fixture_task(
+        BP,
+        SAMPLE_STATS,
+        "Fix the broken median function",
         allow_repo_mode=True,
         persist=False,
     )

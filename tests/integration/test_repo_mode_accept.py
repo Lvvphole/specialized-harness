@@ -45,3 +45,29 @@ def test_repo_mode_accept_fix_mul_sample():
     assert any(e.node_id == "decide" for e in result.trajectory)
     # Sample source must remain broken (isolation)
     assert (SAMPLE_MUL / "app.py").read_text().count("a / b") == 1
+
+
+SAMPLE_STATS = ROOT / "samples" / "repo_stats"
+STATS_BUG = "return ordered[len(ordered) // 2]"
+
+
+def test_repo_mode_accept_fix_median_sample():
+    """Third sample: package tree (not flat) + boundary-case bug (not operator swap)."""
+    core = SAMPLE_STATS / "statskit" / "core.py"
+    assert core.is_file()
+    assert core.read_text().count(STATS_BUG) == 1
+
+    result = run_fixture_task(
+        BP,
+        SAMPLE_STATS,
+        "Fix the broken median function",
+        allow_repo_mode=True,
+        persist=False,
+    )
+    assert result.final_status == FinalStatus.ACCEPT
+    assert any(e.node_id == "decide" for e in result.trajectory)
+    # The repair lands on a nested module, not a top-level app.py
+    implement = next(e for e in result.trajectory if e.node_id == "implement")
+    assert "statskit/core.py" in implement.metadata["files_changed"]
+    # Sample source must remain broken (isolation)
+    assert core.read_text().count(STATS_BUG) == 1
