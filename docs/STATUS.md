@@ -29,6 +29,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 - **ACCEPT (repo mode, offline + live)** — `samples/repo_add` via `--repo` + brief
 - **ACCEPT (repo mode, offline)** — `samples/repo_mul` via `--repo` + brief (EVAL_003; second sample)
 - **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
+- **ACCEPT (repo mode, live OpenAI)** — `samples/repo_mul` (EVAL_005; run_id `1897d3c1-a1f0-47dd-9795-3b588fc08886`; net_loc=3; total_ms 9427)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
@@ -40,7 +41,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 specialized-harness run fix_add
 specialized-harness run --repo samples/repo_add --task "Fix the broken add function"
 # live path (requires propose server + optional OPENAI_API_KEY):
-# see docs/evals/EVAL_001.md / EVAL_002.md / EVAL_004.md
+# see docs/evals/EVAL_001.md / EVAL_002.md / EVAL_004.md / EVAL_005.md
 ```
 
 ---
@@ -91,6 +92,6 @@ Offline qualification for `syntax_clean` / `tests_pass` ships in `specialized_ha
 
 ## 5. Next product moves (when justified)
 
-1. Real-model confirmation on second sample (`repo_mul`) + further corpus growth (EVAL_004+).
+1. Further corpus growth beyond two samples (EVAL_005 closed live OpenAI on `repo_mul`).
 2. Selective CI / path policies when a monorepo demands it.
 3. Admit controls only when they improve Cost per Verified Correct Outcome (incl. token profile under matched ACCEPT; OckBench / Gloaguen as calibration only).
