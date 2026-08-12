@@ -36,10 +36,11 @@ operator swap.
 - **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
 - **ACCEPT (repo mode, live OpenAI)** — `samples/repo_mul` (EVAL_005; run_id `1897d3c1-a1f0-47dd-9795-3b588fc08886`; net_loc=3; total_ms 9427)
 - **ACCEPT (repo mode, offline)** — `samples/repo_stats` (EVAL_007; third sample; run_id `0d70b125-f9db-49a4-831d-cd4165713501`; first package tree + non-operator bug class). Live HTTP **rehearsal** also ACCEPT (`808cc77b-b254-41be-82d5-04b115605490`); real-model confirmation on this sample not yet run.
+- **ACCEPT (repo mode, offline)** — `samples/repo_sub` via `--repo` + brief (fourth sample; corpus growth)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
-**Suite**: `pytest` **123 passed** offline contracts; Sprint 8 adds checker-qualification evals (see [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md)).
+**Suite**: `pytest` **124 passed** offline contracts; Sprint 8 adds checker-qualification evals (see [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md)).
 
 **Operator UX**
 
@@ -47,6 +48,7 @@ operator swap.
 specialized-harness run fix_add
 specialized-harness run --repo samples/repo_add --task "Fix the broken add function"
 specialized-harness run --repo samples/repo_stats --task "Fix the broken median function"
+specialized-harness run --repo samples/repo_sub --task "Fix the broken subtract function"
 # live path (requires propose server + optional OPENAI_API_KEY):
 # see docs/evals/EVAL_001.md / EVAL_002.md / EVAL_004.md / EVAL_005.md / EVAL_007.md
 ```
@@ -99,6 +101,6 @@ Offline qualification for `syntax_clean` / `tests_pass` ships in `specialized_ha
 
 ## 5. Next product moves (when justified)
 
-1. Further corpus growth. Three samples now: `repo_add`, `repo_mul` (both closed live OpenAI, EVAL_002 / EVAL_005) and `repo_stats` (EVAL_007, offline + HTTP rehearsal). Next: a real-model run on `repo_stats`, then a sample whose repair spans more than one file.
+1. Further corpus growth. Four samples now: `repo_add`, `repo_mul` (both closed live OpenAI, EVAL_002 / EVAL_005), `repo_stats` (EVAL_007, offline + HTTP rehearsal) and `repo_sub` (offline). Next: a real-model run on `repo_stats` and `repo_sub`, then a sample whose repair spans more than one file.
 2. Selective CI / path policies when a monorepo demands it.
 3. Admit controls only when they improve Cost per Verified Correct Outcome (incl. token profile under matched ACCEPT; OckBench / Gloaguen as calibration only).
