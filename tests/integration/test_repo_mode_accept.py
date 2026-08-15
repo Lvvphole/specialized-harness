@@ -1,7 +1,7 @@
 """Repo-mode end-to-end ACCEPT (real-use proof, offline ScriptedProvider)."""
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task

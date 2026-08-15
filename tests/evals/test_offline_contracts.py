@@ -3,9 +3,9 @@
 These are the harness effectiveness floor: reproducible ACCEPT / HANDOFF / FAILED
 without network. Seed eval corpus (OBSERVABILITY.md).
 """
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
