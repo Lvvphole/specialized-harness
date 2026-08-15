@@ -71,3 +71,25 @@ def test_repo_mode_accept_fix_median_sample():
     assert "statskit/core.py" in implement.metadata["files_changed"]
     # Sample source must remain broken (isolation)
     assert core.read_text().count(STATS_BUG) == 1
+
+
+SAMPLE_SUB = ROOT / "samples" / "repo_sub"
+
+
+def test_repo_mode_accept_fix_sub_sample():
+    assert SAMPLE_SUB.is_dir()
+    app = SAMPLE_SUB / "app.py"
+    assert "a + b" in app.read_text() or "a+b" in app.read_text()
+    before = app.read_text()
+
+    result = run_fixture_task(
+        BP,
+        SAMPLE_SUB,
+        "Fix the broken subtract function",
+        allow_repo_mode=True,
+        persist=False,
+    )
+    assert result.final_status == FinalStatus.ACCEPT
+    assert any(e.node_id == "decide" for e in result.trajectory)
+    # Sample source must remain broken (isolation)
+    assert app.read_text() == before

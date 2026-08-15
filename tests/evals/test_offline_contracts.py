@@ -69,6 +69,10 @@ def test_eval_accept_repo_mode_package_sample():
 def test_eval_accept_repo_mode_sample_sub():
     if not SAMPLE_SUB.is_dir():
         pytest.skip("samples/repo_sub missing")
+    app = SAMPLE_SUB / "app.py"
+    # Source starts broken (unit contract red)
+    assert "a + b" in app.read_text() or "a+b" in app.read_text()
+    before = app.read_text()
     r = run_fixture_task(
         BP,
         SAMPLE_SUB,
@@ -77,3 +81,6 @@ def test_eval_accept_repo_mode_sample_sub():
         persist=False,
     )
     assert r.final_status == FinalStatus.ACCEPT
+    # Sample source must remain broken (isolation) — EVAL_009 meta-verification floor
+    assert app.read_text() == before
+    assert "a + b" in app.read_text() or "a+b" in app.read_text()
