@@ -27,7 +27,7 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 contract to a second and third tree; `repo_stats` is the first sample that is a package
 rather than a flat `app.py`, and the first whose bug is a boundary case rather than an
 operator swap. `samples/repo_sub` (EVAL_009) adds offline meta-verification evidence
-(unit red on source + ACCEPT + isolation assert + checker-qual floor).
+(executed unit red on source + ACCEPT + isolation assert + checker-qual floor).
 
 **Proven outcomes**
 
@@ -37,7 +37,7 @@ operator swap. `samples/repo_sub` (EVAL_009) adds offline meta-verification evid
 - **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
 - **ACCEPT (repo mode, live OpenAI)** — `samples/repo_mul` (EVAL_005; run_id `1897d3c1-a1f0-47dd-9795-3b588fc08886`; net_loc=3; total_ms 9427)
 - **ACCEPT (repo mode, offline + live OpenAI)** — `samples/repo_stats` (EVAL_007 offline/rehearsal; **EVAL_008** live OpenAI run_id `046e1ec8-2c20-49b1-888e-4dd7a645255e`; net_loc=32; total_ms 16716; 3 tests). First package tree + non-operator bug class under real model.
-- **ACCEPT (repo mode, offline + meta-verification)** — `samples/repo_sub` (EVAL_009; run_id `69c6ca40-1c75-48ea-9a3f-f86737c86f09`; net_loc=5; unit red + offline ACCEPT + isolation assert + checker-qual floor)
+- **ACCEPT (repo mode, offline + meta-verification)** — `samples/repo_sub` (EVAL_009; run_id `892221b5-322f-487b-bd3a-fa3c09ace3b8`; net_loc=5; executed unit red + offline ACCEPT + isolation assert + checker-qual floor)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
