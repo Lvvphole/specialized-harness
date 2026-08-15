@@ -37,7 +37,7 @@ operator swap. `samples/repo_sub` (EVAL_009) adds offline meta-verification evid
 - **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
 - **ACCEPT (repo mode, live OpenAI)** — `samples/repo_mul` (EVAL_005; run_id `1897d3c1-a1f0-47dd-9795-3b588fc08886`; net_loc=3; total_ms 9427)
 - **ACCEPT (repo mode, offline + live OpenAI)** — `samples/repo_stats` (EVAL_007 offline/rehearsal; **EVAL_008** live OpenAI run_id `046e1ec8-2c20-49b1-888e-4dd7a645255e`; net_loc=32; total_ms 16716; 3 tests). First package tree + non-operator bug class under real model.
-- **ACCEPT (repo mode, offline + meta-verification)** — `samples/repo_sub` (EVAL_009; run_id `892221b5-322f-487b-bd3a-fa3c09ace3b8`; net_loc=5; executed unit red + offline ACCEPT + isolation assert + checker-qual floor)
+- **ACCEPT (repo mode, offline + meta-verification)** — `samples/repo_sub` (EVAL_009; **real** persist run_id `b0f079b1-2ace-4c27-b785-7170be5ac6c3`; net_loc=5; total_ms 518; executed unit red + isolation assert)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
