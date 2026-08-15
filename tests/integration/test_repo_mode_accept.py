@@ -1,5 +1,7 @@
 """Repo-mode end-to-end ACCEPT (real-use proof, offline ScriptedProvider)."""
 from pathlib import Path
+import subprocess
+import sys
 
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
@@ -79,8 +81,15 @@ SAMPLE_SUB = ROOT / "samples" / "repo_sub"
 def test_repo_mode_accept_fix_sub_sample():
     assert SAMPLE_SUB.is_dir()
     app = SAMPLE_SUB / "app.py"
-    assert "a + b" in app.read_text() or "a+b" in app.read_text()
     before = app.read_text()
+
+    red = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+    )
+    assert red.returncode != 0
 
     result = run_fixture_task(
         BP,

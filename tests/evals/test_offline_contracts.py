@@ -4,6 +4,8 @@ These are the harness effectiveness floor: reproducible ACCEPT / HANDOFF / FAILE
 without network. Seed eval corpus (OBSERVABILITY.md).
 """
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -67,12 +69,24 @@ def test_eval_accept_repo_mode_package_sample():
 
 @pytest.mark.eval
 def test_eval_accept_repo_mode_sample_sub():
+    """EVAL_009 meta-verification: unit red on source, offline ACCEPT, isolation."""
     if not SAMPLE_SUB.is_dir():
         pytest.skip("samples/repo_sub missing")
     app = SAMPLE_SUB / "app.py"
-    # Source starts broken (unit contract red)
-    assert "a + b" in app.read_text() or "a+b" in app.read_text()
     before = app.read_text()
+
+    # Unit contract must be red on the authoritative sample tests (not substring-only)
+    red = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
+        capture_output=True,
+        text=True,
+        cwd=str(ROOT),
+    )
+    assert red.returncode != 0, (
+        "samples/repo_sub tests must fail while the tree is broken; "
+        f"stdout={red.stdout!r} stderr={red.stderr!r}"
+    )
+
     r = run_fixture_task(
         BP,
         SAMPLE_SUB,
@@ -81,6 +95,6 @@ def test_eval_accept_repo_mode_sample_sub():
         persist=False,
     )
     assert r.final_status == FinalStatus.ACCEPT
-    # Sample source must remain broken (isolation) — EVAL_009 meta-verification floor
+
+    # Sample source must remain broken (isolation)
     assert app.read_text() == before
-    assert "a + b" in app.read_text() or "a+b" in app.read_text()
