@@ -1,0 +1,57 @@
+{
+  "claims": [
+    {
+      "claim_id": "loc_within_budget",
+      "mandatory": true,
+      "method": "measure_net_loc",
+      "observation": "net_loc=5",
+      "subject": "workspace_diff",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "syntax_clean",
+      "mandatory": true,
+      "method": "py_compile",
+      "observation": "compiled 2 files",
+      "subject": "workspace_python",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "tests_pass",
+      "mandatory": true,
+      "method": "pytest",
+      "observation": ".                                                                        [100%]\n1 passed in 0.02s\n",
+      "subject": "workspace_pytest",
+      "verdict": "PASS"
+    }
+  ],
+  "error": null,
+  "extra": {
+    "authority_mode": "repo",
+    "provider": "ScriptedProvider",
+    "task": "Fix the broken subtract function",
+    "mode": "offline",
+    "repo": "samples/repo_sub",
+    "meta_verification": {
+      "unit_broken_sample": "FAILED (assert subtract(5,3)==2 fails as expected)",
+      "offline_eval_contract": "test_eval_accept_repo_mode_sample_sub PASSED",
+      "checker_qualification": "tests/evals/test_checker_qualification.py 3 passed",
+      "source_isolation": "samples/repo_sub/app.py remains a+b after ACCEPT"
+    },
+    "artifact_note": "Persisted offline ACCEPT run; path-heavy metadata stripped. Claims and node order from real run ecf8bfb4."
+  },
+  "final_status": "ACCEPT",
+  "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a",
+  "total_ms": 433,
+  "trajectory": [
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 0, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.517691+00:00", "metadata": {}, "node_id": "resolve_authority", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 1, "started_at": "2026-08-15T13:06:22.517570+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 0, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.517720+00:00", "metadata": {}, "node_id": "constrain_scope", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 2, "started_at": "2026-08-15T13:06:22.517713+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 1, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.518900+00:00", "metadata": {}, "node_id": "provision", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 3, "started_at": "2026-08-15T13:06:22.517800+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 1, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.519500+00:00", "metadata": {}, "node_id": "plan", "node_type": "agentic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 4, "started_at": "2026-08-15T13:06:22.519000+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 1, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.521037+00:00", "metadata": {}, "node_id": "implement", "node_type": "agentic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 5, "started_at": "2026-08-15T13:06:22.519566+00:00", "token_usage": {}, "tools_called": ["read_file:app.py", "search_code:."]},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 1, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.522241+00:00", "metadata": {}, "node_id": "local_verify", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 6, "started_at": "2026-08-15T13:06:22.521066+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 0, "duration_ms": 42, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.564707+00:00", "metadata": {}, "node_id": "push", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 7, "started_at": "2026-08-15T13:06:22.522269+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 1, "duration_ms": 388, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.953266+00:00", "metadata": {}, "node_id": "ci_round", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 8, "started_at": "2026-08-15T13:06:22.564762+00:00", "token_usage": {}, "tools_called": []},
+    {"artifacts": {}, "ci_round": 1, "duration_ms": 0, "error": null, "exit_status": "success", "finished_at": "2026-08-15T13:06:22.953341+00:00", "metadata": {}, "node_id": "decide", "node_type": "deterministic", "recovery_attempt": 0, "run_id": "ecf8bfb4-6f4e-46a3-a7f4-81089395d49a", "sequence": 9, "started_at": "2026-08-15T13:06:22.953310+00:00", "token_usage": {}, "tools_called": []}
+  ]
+}

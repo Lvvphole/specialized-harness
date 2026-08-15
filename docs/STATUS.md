@@ -1,6 +1,6 @@
 # STATUS.md — Done boundary (what is shipped vs deferred)
 
-**Date**: 2026-08-11  
+**Date**: 2026-08-15  
 **Authority**: [AGENTS.md](../AGENTS.md) §4 Definition of Done · [GOAL.md](../GOAL.md)  
 **Audience**: Engineers/operators and vibe coders
 
@@ -26,7 +26,8 @@ For `samples/repo_add` with `--repo` + task brief, **ACCEPT** is proven:
 `samples/repo_mul` (EVAL_003–005) and `samples/repo_stats` (EVAL_007–008) extend the same
 contract to a second and third tree; `repo_stats` is the first sample that is a package
 rather than a flat `app.py`, and the first whose bug is a boundary case rather than an
-operator swap.
+operator swap. `samples/repo_sub` (EVAL_009) adds offline meta-verification evidence
+(unit red on source + ACCEPT + isolation + checker-qual floor).
 
 **Proven outcomes**
 
@@ -36,11 +37,11 @@ operator swap.
 - **ACCEPT (repo mode, live HTTP rehearsal)** — `samples/repo_mul` (EVAL_004; run_id `1baec317-bc15-4796-95cb-9105d315943c`)
 - **ACCEPT (repo mode, live OpenAI)** — `samples/repo_mul` (EVAL_005; run_id `1897d3c1-a1f0-47dd-9795-3b588fc08886`; net_loc=3; total_ms 9427)
 - **ACCEPT (repo mode, offline + live OpenAI)** — `samples/repo_stats` (EVAL_007 offline/rehearsal; **EVAL_008** live OpenAI run_id `046e1ec8-2c20-49b1-888e-4dd7a645255e`; net_loc=32; total_ms 16716; 3 tests). First package tree + non-operator bug class under real model.
-- **ACCEPT (repo mode, offline)** — `samples/repo_sub` via `--repo` + brief (fourth sample; corpus growth)
+- **ACCEPT (repo mode, offline + meta-verification)** — `samples/repo_sub` (EVAL_009; run_id `ecf8bfb4-6f4e-46a3-a7f4-81089395d49a`; net_loc=5; unit red on source + offline ACCEPT + isolation + checker-qual floor)
 - **HUMAN_HANDOFF** — two CI failures (`always_fail_ci`)
 - **FAILED** — net LOC over budget (`over_loc`)
 
-**Suite**: `pytest` **124 passed** offline contracts; Sprint 8 adds checker-qualification evals (see [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md)).
+**Suite**: offline eval contracts + checker qualification (see [VERIFICATION_VS_EVAL.md](VERIFICATION_VS_EVAL.md)).
 
 **Operator UX**
 
@@ -50,7 +51,7 @@ specialized-harness run --repo samples/repo_add --task "Fix the broken add funct
 specialized-harness run --repo samples/repo_stats --task "Fix the broken median function"
 specialized-harness run --repo samples/repo_sub --task "Fix the broken subtract function"
 # live path (requires propose server + optional OPENAI_API_KEY):
-# see docs/evals/EVAL_001.md … EVAL_008.md
+# see docs/evals/EVAL_001.md … EVAL_009.md
 ```
 
 ---
@@ -101,6 +102,6 @@ Offline qualification for `syntax_clean` / `tests_pass` ships in `specialized_ha
 
 ## 5. Next product moves (when justified)
 
-1. Further corpus growth. Four samples: `repo_add` / `repo_mul` (live OpenAI EVAL_002 / EVAL_005); `repo_stats` (EVAL_007 offline+rehearsal, **EVAL_008 live OpenAI**); `repo_sub` (offline). Next: real-model on `repo_sub`, or a sample whose repair spans more than one file.
+1. Further corpus growth. Four samples: `repo_add` / `repo_mul` (live OpenAI EVAL_002 / EVAL_005); `repo_stats` (EVAL_007 offline+rehearsal, **EVAL_008 live OpenAI**); `repo_sub` (EVAL_009 offline meta-verification). Next: real-model on `repo_sub`, or a sample whose repair spans more than one file.
 2. Selective CI / path policies when a monorepo demands it.
 3. Admit controls only when they improve Cost per Verified Correct Outcome (incl. token profile under matched ACCEPT; OckBench / Gloaguen as calibration only).
