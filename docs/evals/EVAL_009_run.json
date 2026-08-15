@@ -1,1 +1,282 @@
-PLACEHOLDER
+{
+  "claims": [
+    {
+      "claim_id": "loc_within_budget",
+      "mandatory": true,
+      "method": "measure_net_loc",
+      "observation": "net_loc=5",
+      "subject": "workspace_diff",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "syntax_clean",
+      "mandatory": true,
+      "method": "py_compile",
+      "observation": "compiled 2 files",
+      "subject": "workspace_python",
+      "verdict": "PASS"
+    },
+    {
+      "claim_id": "tests_pass",
+      "mandatory": true,
+      "method": "pytest",
+      "observation": ".                                                                        [100%]\n1 passed in 0.02s\n",
+      "subject": "workspace_pytest",
+      "verdict": "PASS"
+    }
+  ],
+  "error": null,
+  "extra": {
+    "authority_mode": "repo",
+    "provider": "ScriptedProvider",
+    "task": "Fix the broken subtract function",
+    "mode": "offline",
+    "repo": "samples/repo_sub",
+    "meta_verification": {
+      "unit_broken_sample": "FAILED (assert subtract(5,3)==2 fails as expected)",
+      "offline_eval_contract": "test_eval_accept_repo_mode_sample_sub PASSED (with isolation assertion)",
+      "checker_qualification": "tests/evals/test_checker_qualification.py 3 passed",
+      "source_isolation": "samples/repo_sub/app.py remains a+b after ACCEPT"
+    },
+    "artifact_note": "Full trajectory metadata retained (verifier-critical keys); absolute paths redacted only. total_ms equals sum of event duration_ms."
+  },
+  "final_status": "ACCEPT",
+  "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+  "total_ms": 588,
+  "trajectory": [
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 0,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.814667+00:00",
+      "metadata": {
+        "authority_mode": "repo",
+        "authority_sources": ["repo", "<REPO>", "task_brief"]
+      },
+      "node_id": "resolve_authority",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 1,
+      "started_at": "2026-08-15T13:15:48.814556+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 0,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.814720+00:00",
+      "metadata": {
+        "allowed_paths": ["<REPO>"]
+      },
+      "node_id": "constrain_scope",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 2,
+      "started_at": "2026-08-15T13:15:48.814711+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 1,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.815970+00:00",
+      "metadata": {},
+      "node_id": "provision",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 3,
+      "started_at": "2026-08-15T13:15:48.815000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 1,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.817000+00:00",
+      "metadata": {},
+      "node_id": "plan",
+      "node_type": "agentic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 4,
+      "started_at": "2026-08-15T13:15:48.816000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 2,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.820000+00:00",
+      "metadata": {
+        "files_changed": ["harness_impl_marker.txt", "app.py"],
+        "net_loc": 5,
+        "provider": "ScriptedProvider",
+        "tools_called": ["read_file:app.py", "search_code:."]
+      },
+      "node_id": "implement",
+      "node_type": "agentic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 5,
+      "started_at": "2026-08-15T13:15:48.818000+00:00",
+      "token_usage": {},
+      "tools_called": ["read_file:app.py", "search_code:."]
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 2,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.822000+00:00",
+      "metadata": {
+        "checks": ["syntax"],
+        "command": "py_compile",
+        "exit_code": 0,
+        "stdout": "compiled 2 files"
+      },
+      "node_id": "local_verify",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 6,
+      "started_at": "2026-08-15T13:15:48.820000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 0,
+      "duration_ms": 42,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:48.864000+00:00",
+      "metadata": {
+        "remote_push": false,
+        "remote_push_skipped": true,
+        "skip_reason": "no_remote_configured"
+      },
+      "node_id": "push",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 7,
+      "started_at": "2026-08-15T13:15:48.822000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 1,
+      "duration_ms": 539,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:49.403000+00:00",
+      "metadata": {
+        "command": "pytest -q --tb=no",
+        "exit_code": 0,
+        "stdout": ".                                                                        [100%]\n1 passed in 0.02s\n",
+        "stderr": "",
+        "tests_passed": true,
+        "claims": [
+          {
+            "claim_id": "loc_within_budget",
+            "mandatory": true,
+            "method": "measure_net_loc",
+            "observation": "net_loc=5",
+            "subject": "workspace_diff",
+            "verdict": "PASS"
+          },
+          {
+            "claim_id": "syntax_clean",
+            "mandatory": true,
+            "method": "py_compile",
+            "observation": "compiled 2 files",
+            "subject": "workspace_python",
+            "verdict": "PASS"
+          },
+          {
+            "claim_id": "tests_pass",
+            "mandatory": true,
+            "method": "pytest",
+            "observation": ".                                                                        [100%]\n1 passed in 0.02s\n",
+            "subject": "workspace_pytest",
+            "verdict": "PASS"
+          }
+        ]
+      },
+      "node_id": "ci_round",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 8,
+      "started_at": "2026-08-15T13:15:48.864000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    },
+    {
+      "artifacts": {},
+      "ci_round": 1,
+      "duration_ms": 1,
+      "error": null,
+      "exit_status": "success",
+      "finished_at": "2026-08-15T13:15:49.404000+00:00",
+      "metadata": {
+        "net_loc": 5,
+        "final_status": "ACCEPT",
+        "last_ci_ok": true,
+        "claims": [
+          {
+            "claim_id": "loc_within_budget",
+            "mandatory": true,
+            "method": "measure_net_loc",
+            "observation": "net_loc=5",
+            "subject": "workspace_diff",
+            "verdict": "PASS"
+          },
+          {
+            "claim_id": "syntax_clean",
+            "mandatory": true,
+            "method": "py_compile",
+            "observation": "compiled 2 files",
+            "subject": "workspace_python",
+            "verdict": "PASS"
+          },
+          {
+            "claim_id": "tests_pass",
+            "mandatory": true,
+            "method": "pytest",
+            "observation": ".                                                                        [100%]\n1 passed in 0.02s\n",
+            "subject": "workspace_pytest",
+            "verdict": "PASS"
+          }
+        ]
+      },
+      "node_id": "decide",
+      "node_type": "deterministic",
+      "recovery_attempt": 0,
+      "run_id": "69c6ca40-1c75-48ea-9a3f-f86737c86f09",
+      "sequence": 9,
+      "started_at": "2026-08-15T13:15:49.403000+00:00",
+      "token_usage": {},
+      "tools_called": []
+    }
+  ]
+}
