@@ -27,11 +27,8 @@
   ],
   "error": null,
   "extra": {
-    "artifact_note": "Tracked copy of real persist_run output for run b0f079b1. Only absolute filesystem paths were string-redacted. No trajectory reconstruction; total_ms and metadata unchanged from engine.",
     "authority_mode": "repo",
-    "mode": "offline",
     "provider": "ScriptedProvider",
-    "repo": "samples/repo_sub",
     "task": "Fix the broken subtract function"
   },
   "final_status": "ACCEPT",
