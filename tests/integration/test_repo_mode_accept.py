@@ -5,6 +5,7 @@ from pathlib import Path
 
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
+from specialized_harness.sandboxes.workspace import fingerprint_tree
 
 ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / "blueprints" / "standard-coding.yaml"
@@ -80,8 +81,7 @@ SAMPLE_SUB = ROOT / "samples" / "repo_sub"
 
 def test_repo_mode_accept_fix_sub_sample():
     assert SAMPLE_SUB.is_dir()
-    app = SAMPLE_SUB / "app.py"
-    before = app.read_text()
+    before = fingerprint_tree(SAMPLE_SUB)
 
     red = subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
@@ -89,7 +89,10 @@ def test_repo_mode_accept_fix_sub_sample():
         text=True,
         cwd=str(ROOT),
     )
-    assert red.returncode != 0
+    assert red.returncode == 1, (
+        f"expected TESTS_FAILED (1), got {red.returncode}; "
+        f"stdout={red.stdout!r} stderr={red.stderr!r}"
+    )
 
     result = run_fixture_task(
         BP,
@@ -100,5 +103,7 @@ def test_repo_mode_accept_fix_sub_sample():
     )
     assert result.final_status == FinalStatus.ACCEPT
     assert any(e.node_id == "decide" for e in result.trajectory)
-    # Sample source must remain broken (isolation)
-    assert app.read_text() == before
+    assert result.error is None or "isolation violation" not in (result.error or "")
+    # Whole sample tree isolation (not app.py only)
+    assert fingerprint_tree(SAMPLE_SUB) == before
+    assert not (SAMPLE_SUB / "harness_impl_marker.txt").exists()

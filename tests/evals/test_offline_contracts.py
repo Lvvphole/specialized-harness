@@ -11,6 +11,7 @@ import pytest
 
 from specialized_harness.engine.models import FinalStatus
 from specialized_harness.runner import run_fixture_task
+from specialized_harness.sandboxes.workspace import fingerprint_tree
 
 ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / "blueprints" / "standard-coding.yaml"
@@ -72,20 +73,21 @@ def test_eval_accept_repo_mode_sample_sub():
     """EVAL_009 meta-verification: unit red on source, offline ACCEPT, isolation."""
     if not SAMPLE_SUB.is_dir():
         pytest.skip("samples/repo_sub missing")
-    app = SAMPLE_SUB / "app.py"
-    before = app.read_text()
 
-    # Unit contract must be red on the authoritative sample tests (not substring-only)
+    before = fingerprint_tree(SAMPLE_SUB)
+
+    # Unit contract red: pytest TESTS_FAILED (exit 1), not collection/usage errors
     red = subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
         capture_output=True,
         text=True,
         cwd=str(ROOT),
     )
-    assert red.returncode != 0, (
-        "samples/repo_sub tests must fail while the tree is broken; "
-        f"stdout={red.stdout!r} stderr={red.stderr!r}"
+    assert red.returncode == 1, (
+        "samples/repo_sub must fail with TESTS_FAILED (exit 1) while broken; "
+        f"got {red.returncode}; stdout={red.stdout!r} stderr={red.stderr!r}"
     )
+    assert "test_subtract" in red.stdout or "FAILED" in red.stdout
 
     r = run_fixture_task(
         BP,
@@ -95,6 +97,8 @@ def test_eval_accept_repo_mode_sample_sub():
         persist=False,
     )
     assert r.final_status == FinalStatus.ACCEPT
+    assert r.error is None or "isolation violation" not in (r.error or "")
 
-    # Sample source must remain broken (isolation)
-    assert app.read_text() == before
+    # Whole sample tree isolation (app.py, test_app.py, README, no leaked marker)
+    assert fingerprint_tree(SAMPLE_SUB) == before
+    assert not (SAMPLE_SUB / "harness_impl_marker.txt").exists()
