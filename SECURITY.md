@@ -80,3 +80,9 @@ Required platform controls (to be enabled by the human owner):
 - Do not grant models long-lived credentials with `main` push rights.
 
 See AGENTS.md §8 and CONSTRAINTS.md (Repository governance).
+
+## CI workflow hardening (Tier 0)
+
+- Workflow-level `permissions: {}` (deny by default); jobs grant least privilege.
+- Third-party actions SHA-pinned; `persist-credentials: false` on checkout (except Codex advisory job, which uses a scoped job token for base-ref fetch only).
+- CI never merges to `main` (AGENTS.md §8).
