@@ -2,8 +2,8 @@
 
 **Date**: 2026-08-15  
 **Authority**: AGENTS.md · GOAL.md · STATUS.md · VERIFICATION_VS_EVAL.md · OBSERVABILITY.md  
-**Run id**: `69c6ca40-1c75-48ea-9a3f-f86737c86f09`  
-**Artifact**: [`docs/evals/EVAL_009_run.json`](EVAL_009_run.json) (tracked copy; paths redacted; `artifacts/` remains gitignored)
+**Run id**: `892221b5-322f-487b-bd3a-fa3c09ace3b8`  
+**Artifact**: [`docs/evals/EVAL_009_run.json`](EVAL_009_run.json) (faithful `persist_run` payload; absolute paths redacted only; `artifacts/` remains gitignored)
 
 ## Design
 
@@ -17,9 +17,9 @@
 
 **Meta-verification** here means the Eval-harness floor for this sample (not live-model capability):
 
-1. **Unit red on source** — `pytest samples/repo_sub` fails while the tree is broken (tests are the authority).
+1. **Unit red on source** — `pytest samples/repo_sub` is **executed** and must fail while the tree is broken (tests are the authority).
 2. **Offline ACCEPT** — ScriptedProvider repair under independent ledger + workspace pytest.
-3. **Source isolation** — sample on disk remains broken after ACCEPT (asserted in `test_eval_accept_repo_mode_sample_sub` and integration).
+3. **Source isolation** — sample on disk remains broken after ACCEPT (before/after content assert).
 4. **Checker qualification suite** — deterministic checkers still discriminate (Sprint 8 floor).
 
 ## Outcome
@@ -27,7 +27,7 @@
 | Field | Value |
 |-------|--------|
 | **final_status** | **ACCEPT** |
-| total_ms | 588 |
+| total_ms | 569 |
 | trajectory_len | 9 |
 | trajectory | resolve_authority → constrain_scope → provision → plan → implement → local_verify → push → ci_round → decide |
 | Claims | `loc_within_budget` PASS (`net_loc=5`); `syntax_clean` PASS; `tests_pass` PASS (1 passed; includes reversed/negative cases) |
@@ -38,8 +38,8 @@
 
 | Check | Result |
 |-------|--------|
-| `pytest samples/repo_sub` (broken tree) | **FAILED** — `assert 8 == 2` (expected red) |
-| `test_eval_accept_repo_mode_sample_sub` | **PASSED** (includes isolation assert) |
+| `pytest samples/repo_sub` (broken tree) | **FAILED** (executed in offline + integration contracts) |
+| `test_eval_accept_repo_mode_sample_sub` | **PASSED** (unit red + ACCEPT + isolation) |
 | Integration `test_repo_mode_accept_fix_sub_sample` | **PASSED** |
 | `tests/evals/test_checker_qualification.py` | **3 passed** |
 | Offline eval suite (`tests/evals -m eval`) | **9 passed** |
@@ -49,7 +49,7 @@
 - Provider returned **mutations only** — no ACCEPT claim from the model/scripted path.
 - Declaration of success: harness ledger + workspace pytest only (Verification harness).
 - Trajectory complete (AGENTS.md supporting invariant 9).
-- Tracked run artifact present with **non-path verifier evidence retained** (ci stdout/exit, files_changed, last_ci_ok); absolute paths redacted only.
+- Tracked run artifact is a **faithful `persist_run` payload**: `artifacts` are lists; plan/implement/push/ci_round/decide metadata retained (including `tool_observations`, `branch`/`local_commit`, `tests_passed`, `last_ci_ok`); only absolute paths redacted.
 - `total_ms` equals the sum of trajectory `duration_ms` values.
 
 ## Scope honesty
@@ -69,7 +69,7 @@ specialized-harness run --provider scripted \
   --task "Fix the broken subtract function" \
   --runs-dir artifacts/runs --json
 
-# meta contracts (includes isolation)
+# meta contracts (execute unit red + isolation)
 pytest tests/evals -m eval -q
 pytest tests/integration/test_repo_mode_accept.py::test_repo_mode_accept_fix_sub_sample -q
 pytest tests/evals/test_checker_qualification.py -q
