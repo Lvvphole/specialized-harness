@@ -1,6 +1,8 @@
 """Repo-mode end-to-end ACCEPT (real-use proof, offline ScriptedProvider)."""
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from specialized_harness.engine.models import FinalStatus
@@ -10,6 +12,18 @@ from specialized_harness.sandboxes.workspace import fingerprint_tree
 ROOT = Path(__file__).resolve().parents[2]
 BP = ROOT / "blueprints" / "standard-coding.yaml"
 SAMPLE = ROOT / "samples" / "repo_add"
+
+
+def _run_unit_red_in_disposable_copy(sample: Path) -> subprocess.CompletedProcess[str]:
+    with tempfile.TemporaryDirectory(prefix="harness-unit-red-") as td:
+        copy = Path(td) / sample.name
+        shutil.copytree(sample, copy)
+        return subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "--tb=no", str(copy)],
+            capture_output=True,
+            text=True,
+            cwd=str(copy),
+        )
 
 
 def test_repo_mode_accept_fix_add_sample():
@@ -83,12 +97,7 @@ def test_repo_mode_accept_fix_sub_sample():
     assert SAMPLE_SUB.is_dir()
     before = fingerprint_tree(SAMPLE_SUB)
 
-    red = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
-        capture_output=True,
-        text=True,
-        cwd=str(ROOT),
-    )
+    red = _run_unit_red_in_disposable_copy(SAMPLE_SUB)
     assert red.returncode == 1, (
         f"expected TESTS_FAILED (1), got {red.returncode}; "
         f"stdout={red.stdout!r} stderr={red.stderr!r}"

@@ -3,8 +3,10 @@
 These are the harness effectiveness floor: reproducible ACCEPT / HANDOFF / FAILED
 without network. Seed eval corpus (OBSERVABILITY.md).
 """
+import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -19,6 +21,19 @@ FIX = ROOT / "fixtures"
 SAMPLE = ROOT / "samples" / "repo_add"
 SAMPLE_STATS = ROOT / "samples" / "repo_stats"
 SAMPLE_SUB = ROOT / "samples" / "repo_sub"
+
+
+def _run_unit_red_in_disposable_copy(sample: Path) -> subprocess.CompletedProcess[str]:
+    """Execute sample tests against a disposable copy (not the source tree)."""
+    with tempfile.TemporaryDirectory(prefix="harness-unit-red-") as td:
+        copy = Path(td) / sample.name
+        shutil.copytree(sample, copy)
+        return subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "--tb=no", str(copy)],
+            capture_output=True,
+            text=True,
+            cwd=str(copy),
+        )
 
 
 @pytest.mark.eval
@@ -76,13 +91,8 @@ def test_eval_accept_repo_mode_sample_sub():
 
     before = fingerprint_tree(SAMPLE_SUB)
 
-    # Unit contract red: pytest TESTS_FAILED (exit 1), not collection/usage errors
-    red = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "--tb=no", str(SAMPLE_SUB)],
-        capture_output=True,
-        text=True,
-        cwd=str(ROOT),
-    )
+    # Unit contract red against a disposable copy (never the checked-out source)
+    red = _run_unit_red_in_disposable_copy(SAMPLE_SUB)
     assert red.returncode == 1, (
         "samples/repo_sub must fail with TESTS_FAILED (exit 1) while broken; "
         f"got {red.returncode}; stdout={red.stdout!r} stderr={red.stderr!r}"
